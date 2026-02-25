@@ -1,0 +1,48 @@
+{
+  "info": {
+    "_postman_id": "episodeapi-mocks-001",
+    "name": "EpisodeAPI",
+    "description": "version=1.0 - Mock examples for EpisodeAPI GraphQL service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "getScheduleByFeeds",
+      "request": {
+        "method": "POST",
+        "url": "http://getScheduleByFeeds",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\": \"query getScheduleByFeeds($feed: Feeds!) { getScheduleByFeeds(feed: $feed) { dateFrom dateTo offset feeds { code link logo description } } }\", \"variables\": {\"feed\": \"CDFH_CL\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "default",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getScheduleByFeeds",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\": \"query getScheduleByFeeds($feed: Feeds!) { getScheduleByFeeds(feed: $feed) { dateFrom dateTo offset feeds { code link logo description } } }\", \"variables\": {\"feed\": \"CDFH_CL\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\": {\"getScheduleByFeeds\": {\"dateFrom\": \"2026-02-20\", \"dateTo\": \"2026-03-20\", \"offset\": \"-5\", \"feeds\": [{\"code\": \"CDFH_CL\", \"link\": \"https://example.com/feed\", \"logo\": \"https://example.com/logo.png\", \"description\": \"Demo feed schedule\"}]}}}"
+        }
+      ]
+    }
+  ]
+}

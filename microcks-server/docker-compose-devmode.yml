@@ -1,0 +1,35 @@
+# Lightweight Microcks dev mode -- NO Keycloak, no auth
+# Usage: docker compose -f docker-compose-devmode.yml up -d
+# UI: http://localhost:8585
+
+services:
+  mongo:
+    image: mongo:4.4
+    container_name: microcks-db
+    volumes:
+      - microcks-mongo-data:/data/db
+
+  postman:
+    image: quay.io/microcks/microcks-postman-runtime:latest
+    container_name: microcks-postman-runtime
+
+  app:
+    image: quay.io/microcks/microcks:latest
+    container_name: microcks
+    depends_on:
+      - mongo
+      - postman
+    ports:
+      - "8585:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017
+      SPRING_DATA_MONGODB_DATABASE: microcks
+      POSTMAN_RUNNER_URL: http://postman:3000
+      TEST_CALLBACK_URL: http://microcks:8080
+      KEYCLOAK_ENABLED: "false"
+    volumes:
+      - ./config/application.properties:/deployments/config/application.properties
+
+volumes:
+  microcks-mongo-data:

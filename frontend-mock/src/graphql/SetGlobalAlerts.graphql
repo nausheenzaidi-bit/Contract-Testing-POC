@@ -1,0 +1,14 @@
+mutation SetGlobalAlerts($input: [AlertInput]!) {
+  setGlobalAlerts(input: $input) {
+    spoilers_enabled
+    alerts {
+      type
+      enabled
+    }
+    social {
+      type
+      enabled
+    }
+  }
+}
+

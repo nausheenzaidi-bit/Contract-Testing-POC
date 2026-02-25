@@ -1,0 +1,3653 @@
+
+extend schema 
+    @link(
+        url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key","@external"]
+    )
+
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
+"""
+A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
+"""
+scalar JWT
+
+"""
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSONObject @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
+
+"""
+A field whose value conforms to the standard URL format as specified in RFC3986: https://www.ietf.org/rfc/rfc3986.txt.
+"""
+scalar URL
+
+"""Integers that will have a value of 0 or more."""
+scalar NonNegativeInt
+
+"""Integers that will have a value greater than 0."""
+scalar PositiveInt
+
+"""Floats that will have a value of 0 or more."""
+scalar NonNegativeFloat
+
+"""A string that cannot be passed as an empty value"""
+scalar NonEmptyString
+
+"""
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
+"""
+scalar DateTimeISO
+
+"""
+
+    A string representing a duration conforming to the ISO8601 standard,
+    such as: P1W1DT13H23M34S
+    P is the duration designator (for period) placed at the start of the duration representation.
+    Y is the year designator that follows the value for the number of years.
+    M is the month designator that follows the value for the number of months.
+    W is the week designator that follows the value for the number of weeks.
+    D is the day designator that follows the value for the number of days.
+    T is the time designator that precedes the time components of the representation.
+    H is the hour designator that follows the value for the number of hours.
+    M is the minute designator that follows the value for the number of minutes.
+    S is the second designator that follows the value for the number of seconds.
+
+    Note the time designator, T, that precedes the time value.
+
+    Matches moment.js, Luxon and DateFns implementations
+    ,/. is valid for decimal places and +/- is a valid prefix
+  
+"""
+scalar Duration
+
+"""The locale in the format of a BCP 47 (RFC 5646) standard string"""
+scalar Locale
+
+interface LiveLikeNode {
+  id: UUID!
+}
+
+interface LiveLikeEdge {
+  node: LiveLikeNode
+  cursor: String
+}
+
+interface LiveLikeConnection {
+  edges: [LiveLikeEdge]
+  page: LiveLikePage
+}
+
+enum LiveLikeOrderEnum {
+  ASC
+  DESC
+}
+
+type LiveLikePage {
+  startCursor: String
+  endCursor: String
+  next: PositiveInt
+  previous: PositiveInt
+  count: NonNegativeInt
+}
+
+type LiveLikePaginationOffset {
+  offset: NonNegativeInt
+  limit: NonNegativeInt
+}
+
+type LiveLikePageOffset {
+  count: NonNegativeInt
+  next: LiveLikePaginationOffset
+  previous: LiveLikePaginationOffset
+}
+
+type LiveLikeKeyValuePair {
+  key: String!
+  value: String!
+}
+
+input LiveLikePaginationOffsetInput {
+  offset: NonNegativeInt
+  limit: NonNegativeInt
+}
+
+input LiveLikeKeyValuePairInput {
+  key: String!
+  value: String!
+}
+
+type LiveLikeProfileAuth implements LiveLikeNode @key(fields: "id") @key(fields: "clientId customId") {
+  id: UUID!
+  clientId: NonEmptyString!
+  customId: NonEmptyString
+  accessToken: JWT!
+  nickname: NonEmptyString!
+  createdAt: NonEmptyString!
+}
+
+type LiveLikeProfile implements LiveLikeNode @key(fields: "id") @key(fields: "clientId customId") {
+  id: UUID!
+  clientId: NonEmptyString
+  customId: NonEmptyString
+  nickname: NonEmptyString!
+  customData: String
+  createdAt: NonEmptyString!
+  incomingProfileRelationships(input: LiveLikeIncomingProfileRelationshipInput, order: LiveLikeProfileRelationshipOrderInput): LiveLikeProfileRelationshipCollection
+  outgoingProfileRelationships(input: LiveLikeOutgoingProfileRelationshipInput, order: LiveLikeProfileRelationshipOrderInput): LiveLikeProfileRelationshipCollection
+  widgetsInteractions(input: [LiveLikeWidgetInteractionsInput!]!): [LiveLikeWidgetInteractions!]
+  rewardBalance(input: LiveLikeRewardBalanceGetInput!): LiveLikeRewardItemBalance
+  rewardBalances(input: LiveLikeRewardBalancesGetInput): LiveLikeRewardItemBalanceCollection
+  badges: LiveLikeEarnedBadgeCollection
+  badgeProgress(badgeId: UUID!): [LiveLikeBadgeRewardProgressCollection!]
+  quests(input: LiveLikeUserQuestsInput): LiveLikeUserQuestCollection
+}
+
+type LiveLikeBlockProfile implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  blockedProfileId: UUID!
+  blockedByProfileId: UUID!
+  blockedProfile: LiveLikeProfile!
+  blockedByProfile: LiveLikeProfile!
+}
+
+input LiveLikeProfileGetByCustomIdInput {
+  clientId: NonEmptyString!
+  customId: NonEmptyString!
+}
+
+input LiveLikeProfileCreateInput {
+  clientId: NonEmptyString!
+  nickname: NonEmptyString
+}
+
+input LiveLikeProfileByCustomIdCreateInput {
+  clientId: NonEmptyString!
+  customId: NonEmptyString!
+  nickname: NonEmptyString
+}
+
+input LiveLikeProfileUpdateInput {
+  id: UUID!
+  nickname: NonEmptyString
+  customData: NonEmptyString
+}
+
+type Query {
+  liveLikeMe: LiveLikeProfile
+  liveLikeProfile(id: UUID!): LiveLikeProfile
+  liveLikeProfileByCustomId(input: LiveLikeProfileGetByCustomIdInput!): LiveLikeProfile
+  liveLikeBlockedProfileIds: [UUID!]
+  liveLikeProfileRelationshipType(id: UUID!): LiveLikeProfileRelationshipType
+  liveLikeProfileRelationshipTypes(input: LiveLikeProfileRelationshipTypesInput!): LiveLikeProfileRelationshipTypeCollection
+  liveLikeProfileRelationships(input: LiveLikeProfileRelationshipInput!, order: LiveLikeProfileRelationshipOrderInput): LiveLikeProfileRelationshipCollection
+  liveLikePermissions(page: PositiveInt): LiveLikePermissions
+  liveLikeRoles(input: LiveLikeRolesGetInput!): LiveLikeRoleConnection
+  liveLikeRolesAssignment(input: LiveLikeRoleAssignmentsGetInput!): LiveLikeRoleAssignmentConnection
+  liveLikeApplication(clientId: NonEmptyString!): LiveLikeApplication
+  liveLikeProgram(id: UUID!): LiveLikeProgram
+  liveLikeProgramByCustomId(input: LiveLikeProgramGetByCustomIdInput!): LiveLikeProgram
+  liveLikePrograms(input: LiveLikeProgramsGetInput!): LiveLikeProgramConnection
+  liveLikeWidgets(programId: UUID!, input: LiveLikeWidgetGetInput, order: LiveLikeWidgetOrderInput): LiveLikeWidgetCollection
+  liveLikeWidgetsInteractions(profileId: UUID!, input: [LiveLikeWidgetInteractionsInput!]!): [LiveLikeWidgetInteractions!]
+  liveLikeWidgetReports(input: LiveLikeWidgetReportsInput): LiveLikeWidgetReportCollection
+  liveLikeTextPoll(id: UUID!): LiveLikeTextPoll
+  liveLikeImagePoll(id: UUID!): LiveLikeImagePoll
+  liveLikeRichPost(id: UUID!): LiveLikeRichPost
+  """
+  Fetch the text quiz widget with the id.
+  Returns the TextQuiz object.
+  """
+  liveLikeTextQuiz(id: UUID!): LiveLikeTextQuiz
+  """
+  Fetch the image quiz widget with the id.
+  Returns the ImageQuiz object.
+  """
+  liveLikeImageQuiz(id: UUID!): LiveLikeImageQuiz
+  """
+  Fetch the text prediction widget with the id.
+  Returns the TextPrediction object.
+  """
+  liveLikeTextPrediction(id: UUID!): LiveLikeTextPrediction
+  """
+  Fetch the text prediction follow up widget with the id.
+  Returns the TextPredictionFollowUp object.
+  """
+  liveLikeTextPredictionFollowUp(id: UUID!): LiveLikeTextPredictionFollowUp
+  """
+  Fetch the image prediction widget with the id.
+  Returns the ImagePrediction object.
+  """
+  liveLikeImagePrediction(id: UUID!): LiveLikeImagePrediction
+  """
+  Fetch the image prediction follow up widget with the id.
+  Returns the ImagePredictionFollowUp object.
+  """
+  liveLikeImagePredictionFollowUp(id: UUID!): LiveLikeImagePredictionFollowUp
+  """ Get a Alert widget by ID """
+  liveLikeAlert(id: UUID!): LiveLikeAlert
+  """ Get a Video Alert widget by ID """
+  liveLikeVideoAlert(id: UUID!): LiveLikeVideoAlert
+  """ Get a Social Embed widget by ID """
+  liveLikeSocialEmbed(id: UUID!): LiveLikeSocialEmbed
+  liveLikeReactionPack(id: UUID!): LiveLikeReactionPack
+  liveLikeReactionPacks(input: LiveLikeReactionPacksGetInput!): LiveLikeReactionPackCollection
+  liveLikeReactionSpace(id: UUID!): LiveLikeReactionSpace
+  liveLikeReactionSpaces(input: LiveLikeReactionSpaceGetInput!): LiveLikeReactionSpaceCollection
+  liveLikeReactionSpacesCount(input: LiveLikeReactionSpacesCountInput!): [LiveLikeReactionSpaceCount!]
+  liveLikeUserReactions(input: LiveLikeUserReactionsGetInput!): LiveLikeUserReactionCollection
+  liveLikeUserReactionCounts(input: LiveLikeUserReactionCountsGetInput!): LiveLikeUserReactionCountCollection
+  liveLikeCommentBoard(id: UUID!): LiveLikeCommentBoard
+  liveLikeCommentBoards(input: LiveLikeCommentBoardsGetInput!): LiveLikeCommentBoardCollection
+  liveLikeCommentBoardsCount(input: LiveLikeCommentBoardsCountGetInput!): [LiveLikeCommentBoardCount!]
+  liveLikeComment(id: UUID!): LiveLikeComment
+  liveLikeComments(input: LiveLikeCommentsGetInput!): LiveLikeCommentCollection
+  liveLikeCommentReplies(input: LiveLikeCommentRepliesGetInput!): LiveLikeCommentCollection
+  liveLikeCommentReport(id: UUID!): LiveLikeCommentReport
+  liveLikeCommentsReports(input: LiveLikeCommentsReportsGetInput!): LiveLikeCommentReportCollection
+  liveLikeChatRoom(id: UUID!): LiveLikeChatRoom
+  liveLikeChatRooms(input: LiveLikeChatRoomsGetInput!): LiveLikeChatRoomCollection
+  liveLikeRewardItem(id: UUID!): LiveLikeRewardItem
+  liveLikeRewardItems(clientId: NonEmptyString!): LiveLikeRewardItemCollection
+  liveLikeRewardTable(id: UUID!): LiveLikeRewardTable
+  liveLikeRewardTables(input: LiveLikeRewardTablesGetInput!): LiveLikeRewardTableCollection
+  liveLikeRewardTableEntry(input: LiveLikeRewardTableEntryGetInput!): LiveLikeRewardTableEntry
+  liveLikeRewardBalance(profileId: UUID!, input: LiveLikeRewardBalanceGetInput!): LiveLikeRewardItemBalance
+  liveLikeRewardBalances(profileId: UUID!, input: LiveLikeRewardBalancesGetInput): LiveLikeRewardItemBalanceCollection
+  liveLikeLeaderboard(id: UUID!): LiveLikeLeaderboard
+  liveLikeLeaderboards(input: LiveLikeLeaderboardsGetInput!): LiveLikeLeaderboardCollection
+  liveLikeLeaderboardEntry(input: LiveLikeLeaderboardEntryGetInput!): LiveLikeLeaderboardEntry
+  liveLikeLeaderboardEntries(input: LiveLikeLeaderboardEntriesGetInput!): LiveLikeLeaderboardEntryCollection
+  liveLikeBadge(id: UUID!): LiveLikeBadge
+  liveLikeBadges(clientId: NonEmptyString!): LiveLikeBadgeCollection
+  liveLikeBadgeProfiles(badgeId: UUID!): LiveLikeBadgeProfileCollection
+  liveLikeBadgeProgress(profileId: UUID!, badgeId: UUID!): [LiveLikeBadgeRewardProgressCollection!]
+  liveLikeEarnedBadges(profileId: UUID!): LiveLikeEarnedBadgeCollection
+  liveLikeUserBadges(page: PositiveInt): LiveLikeUserBadgeCollection
+  liveLikeProgramBans(input: LiveLikeProgramBansInput): LiveLikeProgramBanCollection
+  liveLikeCommentBoardBan(id: UUID!): LiveLikeCommentBoardBan
+  liveLikeCommentBoardBans(input: LiveLikeCommentBoardBansInput): LiveLikeCommentBoardBanCollection
+  liveLikeQuests(clientId: NonEmptyString!): LiveLikeQuestCollection
+  liveLikeUserQuests(profileId: UUID!, input: LiveLikeUserQuestsInput): LiveLikeUserQuestCollection
+  liveLikeUserQuestRewards(input: LiveLikeUserQuestRewardsInput!): LiveLikeUserQuestRewardsConnection
+}
+
+type Mutation {
+  createLiveLikeProfile(input: LiveLikeProfileCreateInput!): LiveLikeProfileAuth
+  createLiveLikeProfileByCustomId(input: LiveLikeProfileByCustomIdCreateInput!): LiveLikeProfileAuth
+  updateLiveLikeProfile(input: LiveLikeProfileUpdateInput!): LiveLikeProfile
+  deleteLiveLikeProfile(id: UUID!): Boolean
+  blockLiveLikeProfile(profileId: UUID!): LiveLikeBlockProfile
+  deleteLiveLikeProfileBlock(id: UUID!): Boolean
+  createLiveLikeProfileRelationshipType(input: LiveLikeProfileRelationshipTypeCreateInput!): LiveLikeProfileRelationshipType
+  createLiveLikeProfileRelationship(input: LiveLikeProfileRelationshipCreateInput!): LiveLikeProfileRelationship
+  deleteLiveLikeProfileRelationshipType(id: UUID!): Boolean
+  deleteLiveLikeProfileRelationship(id: UUID!): Boolean
+  createLiveLikeRole(input: LiveLikeRoleCreateInput!): LiveLikeRole
+  createLiveLikeRoleAssignment(input: LiveLikeRoleAssignmentCreateInput!): LiveLikeRoleAssignment
+  createLiveLikeProgram(input: LiveLikeProgramCreateInput!): LiveLikeProgram
+  updateLiveLikeProgram(input: LiveLikeProgramUpdateInput!): LiveLikeProgram
+  startLiveLikeProgram(id: UUID!): LiveLikeProgramSchedule
+  stopLiveLikeProgram(id: UUID!): LiveLikeProgramSchedule
+  updateLiveLikeProgramByCustomId(input: LiveLikeProgramUpdateByCustomIdInput!): LiveLikeProgram
+  deleteLiveLikeProgram(id: UUID!): Boolean
+  deleteLiveLikeProgramByCustomId(input: LiveLikeProgramDeleteByCustomIdInput!): Boolean
+  publishLiveLikeWidget(kind: LiveLikeWidgetKindEnum!, input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  reportLiveLikeWidget(input: LiveLikeWidgetReportInput!): LiveLikeWidgetReport
+  deleteLiveLikeWidget(input: LiveLikeWidgetDeleteInput!): Boolean
+  createLiveLikeTextPoll(input: LiveLikeTextPollCreateInput!): LiveLikeTextPoll
+  createLiveLikeImagePoll(input: LiveLikeImagePollCreateInput!): LiveLikeImagePoll
+  createLiveLikePollVote(input: LiveLikePollVoteCreateInput!): LiveLikeWidgetInteraction @deprecated(reason: "Use widget specific one (createTextPollVote, createImagePollVote)")
+  updateLiveLikePollVote(input: LiveLikePollVoteUpdateInput!): LiveLikeWidgetInteraction @deprecated(reason: "Use widget specific one (updateTextPollVote, updateImagePollVote)")
+  """ Vote on a text poll """
+  createLiveLikeTextPollVote(input: LiveLikeTextPollVoteCreateInput!): LiveLikeTextPollVote
+  """ Update Vote on a voted text poll """
+  updateLiveLikeTextPollVote(input: LiveLikeTextPollVoteUpdateInput!): LiveLikeTextPollVote
+  """ Vote on a image poll """
+  createLiveLikeImagePollVote(input: LiveLikeImagePollVoteCreateInput!): LiveLikeImagePollVote
+  """ Update Vote on a voted image poll """
+  updateLiveLikeImagePollVote(input: LiveLikeImagePollVoteUpdateInput!): LiveLikeImagePollVote
+  """Publish a Text Poll widget"""
+  publishLiveLikeTextPoll(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Image Poll widget"""
+  publishLiveLikeImagePoll(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a Text Poll widget"""
+  deleteLiveLikeTextPoll(id: UUID!): Boolean
+  """Delete a Image Poll widget"""
+  deleteLiveLikeImagePoll(id: UUID!): Boolean
+  """Create a Rich Post widget"""
+  createLiveLikeRichPost(input: LiveLikeRichPostCreateInput!): LiveLikeRichPost
+  """Publish a Rich Post widget"""
+  publishLiveLikeRichPost(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a Rich Post widget"""
+  deleteLiveLikeRichPost(id: UUID!): Boolean
+  """
+  Creates a new text quiz widget with the provided input.
+  Returns the created TextQuiz object.
+  """
+  createLiveLikeTextQuiz(input: LiveLikeTextQuizCreateInput!): LiveLikeTextQuiz
+  """
+  Creates a new image quiz widget with the provided input.
+  Returns the created ImageQuiz object.
+  """
+  createLiveLikeImageQuiz(input: LiveLikeImageQuizCreateInput!): LiveLikeImageQuiz
+  """ Answer on a text quiz """
+  createLiveLikeTextQuizAnswer(input: LiveLikeTextQuizAnswerCreateInput!): LiveLikeTextQuizAnswer
+  """ Update answer on a answered text quiz """
+  updateLiveLikeTextQuizAnswer(input: LiveLikeTextQuizAnswerUpdateInput!): LiveLikeTextQuizAnswer
+  """ Answer on a image quiz """
+  createLiveLikeImageQuizAnswer(input: LiveLikeImageQuizAnswerCreateInput!): LiveLikeImageQuizAnswer
+  """ Update answer on a answered image quiz """
+  updateLiveLikeImageQuizAnswer(input: LiveLikeImageQuizAnswerUpdateInput!): LiveLikeImageQuizAnswer
+  """Publish a Text Quiz widget"""
+  publishLiveLikeTextQuiz(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Image Quiz widget"""
+  publishLiveLikeImageQuiz(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a Text Quiz widget"""
+  deleteLiveLikeTextQuiz(id: UUID!): Boolean
+  """Delete a Image Quiz widget"""
+  deleteLiveLikeImageQuiz(id: UUID!): Boolean
+  """
+  Creates a new text prediction widget with the provided input.
+  Returns the created TextPrediction object.
+  """
+  createLiveLikeTextPrediction(input: LiveLikeTextPredictionCreateInput!): LiveLikeTextPrediction
+  """
+  Creates a new text prediction follow up widget with the provided input.
+  Returns the created TextPredictionFollowUp object.
+  """
+  createLiveLikeTextPredictionFollowUp(input: LiveLikeTextPredictionFollowUpCreateInput!): LiveLikeTextPredictionFollowUp
+  """
+  Creates a new image prediction widget with the provided input.
+  Returns the created ImagePrediction object.
+  """
+  createLiveLikeImagePrediction(input: LiveLikeImagePredictionCreateInput!): LiveLikeImagePrediction
+  """
+  Creates a new image prediction follow up widget with the provided input.
+  Returns the created ImagePredictionFollowUp object.
+  """
+  createLiveLikeImagePredictionFollowUp(input: LiveLikeImagePredictionFollowUpCreateInput!): LiveLikeImagePredictionFollowUp
+  """ Vote on a text prediction """
+  createLiveLikeTextPredictionVote(input: LiveLikeTextPredictionVoteCreateInput!): LiveLikeTextPredictionVote
+  """ Update Vote on a voted text prediction """
+  updateLiveLikeTextPredictionVote(input: LiveLikeTextPredictionVoteUpdateInput!): LiveLikeTextPredictionVote
+  """ Vote on a image prediction """
+  createLiveLikeImagePredictionVote(input: LiveLikeImagePredictionVoteCreateInput!): LiveLikeImagePredictionVote
+  """ Update Vote on a voted image prediction """
+  updateLiveLikeImagePredictionVote(input: LiveLikeImagePredictionVoteUpdateInput!): LiveLikeImagePredictionVote
+  """Publish a Text Prediction widget"""
+  publishLiveLikeTextPrediction(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Text Prediction Follow Up widget"""
+  publishLiveLikeTextPredictionFollowUp(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Image Prediction widget"""
+  publishLiveLikeImagePrediction(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Image Prediction Follow Up widget"""
+  publishLiveLikeImagePredictionFollowUp(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a Text Prediction widget"""
+  deleteLiveLikeTextPrediction(id: UUID!): Boolean
+  """Delete a Text Prediction Follow up widget"""
+  deleteLiveLikeTextPredictionFollowUp(id: UUID!): Boolean
+  """Delete a Image Prediction widget"""
+  deleteLiveLikeImagePrediction(id: UUID!): Boolean
+  """Delete a Image Prediction Follow up widget"""
+  deleteLiveLikeImagePredictionFollowUp(id: UUID!): Boolean
+  """Create a Alert widget"""
+  createLiveLikeAlert(input: LiveLikeAlertCreateInput!): LiveLikeAlert
+  """Create a Video Alert widget"""
+  createLiveLikeVideoAlert(input: LiveLikeVideoAlertCreateInput!): LiveLikeVideoAlert
+  """Publish a Alert widget"""
+  publishLiveLikeAlert(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Publish a Video Alert widget"""
+  publishLiveLikeVideoAlert(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a Alert widget"""
+  deleteLiveLikeAlert(id: UUID!): Boolean
+  """Delete a Video Alert widget"""
+  deleteLiveLikeVideoAlert(id: UUID!): Boolean
+  """Create a SocialEmbed widget"""
+  createLiveLikeSocialEmbed(input: LiveLikeSocialEmbedCreateInput!): LiveLikeSocialEmbed
+  """Publish a SocialEmbed widget"""
+  publishLiveLikeSocialEmbed(input: LiveLikeWidgetPublishInput!): LiveLikeWidgetPublish
+  """Delete a SocialEmbed widget"""
+  deleteLiveLikeSocialEmbed(id: UUID!): Boolean
+  createLiveLikeReactionSpace(input: LiveLikeReactionSpaceCreateInput!): LiveLikeReactionSpace
+  updateLiveLikeReactionSpace(input: LiveLikeReactionSpaceUpdateInput!): LiveLikeReactionSpacePatch
+  deleteLiveLikeReactionSpace(input: LiveLikeReactionSpaceDeleteInput!): Boolean
+  createLiveLikeUserReaction(input: LiveLikeUserReactionCreateInput!): LiveLikeUserReaction
+  deleteLiveLikeUserReaction(id: UUID!): Boolean
+  createLiveLikeCommentBoard(input: LiveLikeCommentBoardCreateInput!): LiveLikeCommentBoard
+  updateLiveLikeCommentBoard(input: LiveLikeCommentBoardUpdateInput!): LiveLikeCommentBoard
+  deleteLiveLikeCommentBoard(id: UUID!): Boolean
+  createLiveLikeComment(input: LiveLikeCommentCreateInput!): LiveLikeComment
+  createLiveLikeCommentReply(input: LiveLikeCommentReplyCreateInput!): LiveLikeComment
+  deleteLiveLikeComment(id: UUID!): Boolean
+  createLiveLikeCommentReport(input: LiveLikeCommentReportCreateInput!): LiveLikeCommentReport
+  dismissLiveLikeCommentReport(id: UUID!): LiveLikeCommentReport
+  createLiveLikeChatRoom(input: LiveLikeChatRoomCreateInput!): LiveLikeChatRoom
+  updateLiveLikeChatRoom(input: LiveLikeChatRoomUpdateInput!): LiveLikeChatRoom
+  deleteLiveLikeChatRoom(id: UUID!): Boolean
+  createLiveLikeRewardItem(input: LiveLikeRewardItemCreateInput!): LiveLikeRewardItem
+  """
+  Credit reward item points to a user profile.
+  Returns the resulting RewardItemTransaction.
+  """
+  creditLiveLikeRewardItem(input: LiveLikeRewardItemTransactionInput!): LiveLikeRewardItemTransaction
+  """
+  Debit reward item points from a user profile.
+  Returns the resulting RewardItemTransaction.
+  """
+  debitLiveLikeRewardItem(input: LiveLikeRewardItemTransactionInput!): LiveLikeRewardItemTransaction
+  deleteLiveLikeRewardItem(id: UUID!): Boolean
+  createLiveLikeRewardTable(input: LiveLikeRewardTableCreateInput!): LiveLikeRewardTable
+  updateLiveLikeRewardTable(input: LiveLikeRewardTableUpdateInput!): LiveLikeRewardTable
+  deleteLiveLikeRewardTable(id: UUID!): Boolean
+  createLiveLikeRewardTableEntry(input: LiveLikeRewardTableEntryCreateInput!): LiveLikeRewardTableEntry
+  deleteLiveLikeRewardTableEntry(input: LiveLikeRewardTableEntryDeleteInput!): Boolean
+  linkLiveLikeRewardTableWithProgram(input: LiveLikeLinkRewardTableWithProgramInput!): Boolean
+  unlinkLiveLikeRewardTableWithProgram(input: LiveLikeUnlinkRewardTableWithProgramInput!): Boolean
+  invokeLiveLikeRewardAction(input: LiveLikeRewardActionCreateInput!): LiveLikeRewardAction
+  createLiveLikeLeaderboard(input: LiveLikeLeaderboardCreateInput!): LiveLikeLeaderboard
+  updateLiveLikeLeaderboard(input: LiveLikeLeaderboardUpdateInput!): LiveLikeLeaderboard
+  deleteLiveLikeLeaderboard(id: UUID!): Boolean
+  linkLiveLikeLeaderboardWithProgram(input: LiveLikeLeaderboardProgramLinkInput!): Boolean
+  unlinkLiveLikeLeaderboardFromProgram(input: LiveLikeLeaderboardProgramLinkInput!): Boolean
+  awardLiveLikeBadge(input: LiveLikeAwardBadgeInput!): LiveLikeEarnedBadge
+  revokeLiveLikeEarnedBadge(earnedBadgeId: UUID!): Boolean
+  createLiveLikeProgramBan(input: LiveLikeProgramBanInput!): LiveLikeProgramBan
+  deleteLiveLikeProgramBan(id: UUID!): Boolean
+  createLiveLikeCommentBoardBan(input: LiveLikeCommentBoardBanInput!): LiveLikeCommentBoardBan
+  deleteLiveLikeCommentBoardBan(id: UUID!): Boolean
+  createLiveLikeQuest(input: LiveLikeQuestInput!): LiveLikeQuest
+  createLiveLikeUserQuest(input: LiveLikeUserQuestInput!): LiveLikeUserQuest
+  updateLiveLikeUserQuestTaskProgress(input: LiveLikeUserQuestsTaskProgressInput!): LiveLikeUserQuestTaskProgress
+  claimLiveLikeUserQuestReward(input: LiveLikeclaimUserQuestRewardInput!): LiveLikeUserQuest
+}
+
+enum LiveLikeProfileRelationshipOrderField {
+  CREATED_AT
+}
+
+type LiveLikeProfileRelationshipType implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  key: NonEmptyString!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeProfileRelationship implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  relationshipType: LiveLikeProfileRelationshipType!
+  fromProfile: LiveLikeProfile!
+  toProfile: LiveLikeProfile!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeProfileRelationshipTypeEdge implements LiveLikeEdge {
+  node: LiveLikeProfileRelationshipType!
+  cursor: String
+}
+
+type LiveLikeProfileRelationshipEdge implements LiveLikeEdge {
+  node: LiveLikeProfileRelationship!
+  cursor: String
+}
+
+type LiveLikeProfileRelationshipTypeCollection implements LiveLikeConnection {
+  edges: [LiveLikeProfileRelationshipTypeEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeProfileRelationshipCollection implements LiveLikeConnection {
+  edges: [LiveLikeProfileRelationshipEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeProfileRelationshipTypesInput {
+  clientId: NonEmptyString!
+  key: NonEmptyString
+}
+
+input LiveLikeProfileRelationshipTypeCreateInput {
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  key: NonEmptyString!
+}
+
+input LiveLikeProfileRelationshipCreateInput {
+  relationshipTypeKey: NonEmptyString!
+  fromProfileId: UUID!
+  toProfileId: UUID!
+}
+
+input LiveLikeProfileRelationshipInput {
+  clientId: NonEmptyString!
+  relationshipTypeKey: NonEmptyString
+  fromProfileId: UUID
+  toProfileId: UUID
+  since: DateTimeISO
+  until: DateTimeISO
+}
+
+input LiveLikeIncomingProfileRelationshipInput {
+  relationshipTypeKey: NonEmptyString
+  fromProfileId: UUID
+  since: DateTimeISO
+  until: DateTimeISO
+}
+
+input LiveLikeOutgoingProfileRelationshipInput {
+  relationshipTypeKey: NonEmptyString
+  toProfileId: UUID
+  since: DateTimeISO
+  until: DateTimeISO
+}
+
+input LiveLikeProfileRelationshipOrderInput {
+  field: LiveLikeProfileRelationshipOrderField!
+  order: LiveLikeOrderEnum
+}
+
+enum LiveLikeResourceKindEnum {
+  ALERT
+  APPLICATION
+  CHAT_ROOM
+  CHEER_METER
+  COMMENT_BOARD
+  EMOJI_POLL
+  EMOJI_SLIDER
+  IMAGE_NUMBER_PREDICTION
+  IMAGE_NUMBER_PREDICTION_FOLLOW_UP
+  IMAGE_POLL
+  IMAGE_PREDICTION
+  IMAGE_PREDICTION_FOLLOW_UP
+  IMAGE_QUIZ
+  PROFILE
+  PROGRAM
+  RICH_POST
+  SOCIAL_EMBED
+  TEXT_ASK
+  TEXT_POLL
+  TEXT_PREDICTION
+  TEXT_PREDICTION_FOLLOW_UP
+  TEXT_QUIZ
+  TWITTER_SPOTLIGHT
+  VIDEO_ALERT
+}
+
+type LiveLikePermission implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  key: NonEmptyString!
+  name: NonEmptyString!
+  description: String!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikePermissionEdge implements LiveLikeEdge {
+  node: LiveLikePermission!
+  cursor: String
+}
+
+type LiveLikePermissions implements LiveLikeConnection {
+  edges: [LiveLikePermissionEdge]
+  page: LiveLikePage!
+}
+
+type LiveLikeRole implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  key: NonEmptyString!
+  name: NonEmptyString!
+  description: String!
+  isActive: Boolean!
+  createdAt: DateTimeISO!
+  permissions: [LiveLikePermission!]!
+}
+
+type LiveLikeRoleEdge implements LiveLikeEdge {
+  node: LiveLikeRole!
+  cursor: String
+}
+
+type LiveLikeRoleConnection implements LiveLikeConnection {
+  edges: [LiveLikeRoleEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeResource implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  kind: LiveLikeResourceKindEnum!
+  name: NonEmptyString!
+  description: NonEmptyString!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeScope implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  resourceKey: NonEmptyString!
+  resource: LiveLikeResource!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeRoleAssignment implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  profile: LiveLikeProfile
+  role: LiveLikeRole
+  scope: LiveLikeScope
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeRoleAssignmentEdge implements LiveLikeEdge {
+  node: LiveLikeRoleAssignment!
+  cursor: String
+}
+
+type LiveLikeRoleAssignmentConnection implements LiveLikeConnection {
+  edges: [LiveLikeRoleAssignmentEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeRolesGetInput {
+  clientId: NonEmptyString!
+  page: PositiveInt
+}
+
+input LiveLikeRoleCreateInput {
+  """key of the role to be created"""
+  key: NonEmptyString!
+  """name of the role to be created"""
+  name: NonEmptyString!
+  """key of the role template to add permissions from"""
+  roleTemplateKey: NonEmptyString
+  """Array of permissionIds to add to the role"""
+  permissionIds: [UUID!]
+  """Array of permissionKeys to add to the role"""
+  permissionKeys: [NonEmptyString!]
+}
+
+input LiveLikeRoleAssignmentsGetInput {
+  profileId: NonEmptyString
+  profileCustomId: NonEmptyString
+  page: PositiveInt
+}
+
+input LiveLikeRoleAssignmentCreateInput {
+  """id of the profile to assign the role to"""
+  profileId: UUID!
+  """key of the role to assign to the profile"""
+  roleKey: NonEmptyString!
+  """key of the scope to assign the role to"""
+  resourceKey: NonEmptyString!
+  """kind of the scope to assign the role to"""
+  resourceKind: LiveLikeResourceKindEnum!
+}
+
+type LiveLikeApplication @key(fields: "clientId") {
+  clientId: NonEmptyString!
+  name: String!
+  organizationId: UUID!
+  organizationName: NonEmptyString!
+  imageUrl: URL!
+  mediaUrl: URL!
+  apiPollingInterval: PositiveInt!
+  pubnubOrigin: NonEmptyString
+  pubnubSubscribeKey: NonEmptyString
+  pubnubPublishKey: NonEmptyString
+  pubnubHeartbeatInterval: NonNegativeInt
+  pubnubPresenceTimeout: NonNegativeInt
+}
+
+enum LiveLikeProgramStatusEnum {
+  FUTURE
+  LIVE
+  PAST
+}
+
+type LiveLikeProgram implements LiveLikeNode @key(fields: "id") @key(fields: "clientId customId") {
+  id: UUID!
+  """The unique identifier of the app to create the program in"""
+  clientId: NonEmptyString!
+  """The human-readable title of the program"""
+  title: NonEmptyString!
+  widgetsEnabled: Boolean!
+  status: LiveLikeProgramStatusEnum!
+  """Associate this Program with an ID in another system"""
+  customId: NonEmptyString
+  """
+  List of sponsors to link with the program. Note that only valid sponsor_ids will be linked to a program.
+  """
+  sponsorIds: [UUID!]
+  """
+  The date and time the program is scheduled to begin in ISO format compliant with RFC 3339
+  """
+  scheduledAt: DateTimeISO!
+  """
+  The date and time the program started in ISO format compliant with RFC 3339
+  """
+  startedAt: DateTimeISO
+  """
+  The date and time the program stopped in ISO format compliant with RFC 3339
+  """
+  stoppedAt: DateTimeISO
+  """The date and time the program was created in ISO format"""
+  createdAt: NonEmptyString!
+  widgets(input: LiveLikeWidgetGetInput, order: LiveLikeWidgetOrderInput): LiveLikeWidgetCollection
+}
+
+type LiveLikeProgramSchedule implements LiveLikeNode {
+  id: UUID!
+  status: LiveLikeProgramStatusEnum!
+  startedAt: DateTimeISO
+  stoppedAt: DateTimeISO
+}
+
+type LiveLikeProgramEdge implements LiveLikeEdge {
+  node: LiveLikeProgram!
+  cursor: String
+}
+
+type LiveLikeProgramConnection implements LiveLikeConnection {
+  edges: [LiveLikeProgramEdge]
+  page: LiveLikePage!
+}
+
+input LiveLikeProgramLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Localized title of the program"""
+  title: NonEmptyString!
+}
+
+input LiveLikeProgramGetByCustomIdInput {
+  clientId: NonEmptyString!
+  """Associates this Program with an ID in another system"""
+  customId: NonEmptyString!
+}
+
+input LiveLikeProgramsGetInput {
+  clientId: NonEmptyString!
+  page: PositiveInt
+}
+
+input LiveLikeProgramCreateInput {
+  clientId: NonEmptyString!
+  """Associate this Program with an ID in another system"""
+  customId: NonEmptyString
+  """The human-readable title of the program"""
+  title: NonEmptyString!
+  """
+  The date and time the program is scheduled to begin in ISO format compliant with RFC 3339
+  """
+  scheduledAt: DateTimeISO!
+  """
+  List of sponsors to link with the program. Note that only valid sponsorId's will be linked to a program.
+  """
+  sponsorIds: [UUID!]
+  """Program localized data"""
+  localizedData: [LiveLikeProgramLocalizedInput!]
+}
+
+input LiveLikeProgramUpdateInput {
+  id: UUID!
+  """Associate this Program with an ID in another system"""
+  customId: NonEmptyString
+  """The human-readable title of the program"""
+  title: NonEmptyString
+  """
+  The date and time the program is scheduled to begin in ISO format compliant with RFC 3339
+  """
+  scheduledAt: DateTimeISO
+  """
+  List of sponsors to link with the program. Note that only valid sponsorId's will be linked to a program.
+  """
+  sponsorIds: [UUID!]
+  """Program localized data"""
+  localizedData: [LiveLikeProgramLocalizedInput!]
+}
+
+input LiveLikeProgramUpdateByCustomIdInput {
+  clientId: NonEmptyString!
+  """Associate this Program with an ID in another system"""
+  customId: NonEmptyString!
+  """The human-readable title of the program"""
+  title: NonEmptyString
+  """
+  The date and time the program is scheduled to begin in ISO format compliant with RFC 3339
+  """
+  scheduledAt: DateTimeISO
+  """
+  List of sponsors to link with the program. Note that only valid sponsorId's will be linked to a program.
+  """
+  sponsorIds: [UUID!]
+  """Program localized data"""
+  localizedData: [LiveLikeProgramLocalizedInput!]
+}
+
+input LiveLikeProgramDeleteByCustomIdInput {
+  clientId: NonEmptyString!
+  """Associates this Program with an ID in another system"""
+  customId: NonEmptyString!
+}
+
+enum LiveLikeWidgetStatusEnum {
+  PENDING
+  SCHEDULED
+  PUBLISHED
+  INFLIGHT
+}
+
+enum LiveLikeWidgetKindEnum {
+  SOCIAL_EMBED
+  ALERT
+  VIDEO_ALERT
+  TEXT_PREDICTION
+  IMAGE_PREDICTION
+  TEXT_PREDICTION_FOLLOW_UP
+  IMAGE_PREDICTION_FOLLOW_UP
+  TEXT_QUIZ
+  IMAGE_QUIZ
+  TEXT_POLL
+  IMAGE_POLL
+  RICH_POST
+}
+
+enum LiveLikeWidgetOrderField {
+  RECENT
+  CREATED_AT
+  SCHEDULED_AT
+  PUBLISHED_AT
+}
+
+enum LiveLikeWidgetReportStatusEnum {
+  PENDING
+  ACCEPTED
+  DISMISSED
+}
+
+enum LiveLikeWidgetInteractionEnum {
+  TEXT_PREDICTION
+  IMAGE_PREDICTION
+  TEXT_QUIZ
+  IMAGE_QUIZ
+  TEXT_POLL
+  IMAGE_POLL
+}
+
+union LiveLikeWidget = LiveLikeTextPoll | LiveLikeImagePoll | LiveLikeRichPost | LiveLikeTextQuiz | LiveLikeImageQuiz | LiveLikeTextPrediction | LiveLikeImagePrediction | LiveLikeTextPredictionFollowUp | LiveLikeImagePredictionFollowUp | LiveLikeAlert | LiveLikeVideoAlert | LiveLikeSocialEmbed
+
+union LiveLikeWidgetInteractionUnion = LiveLikeTextPollVote | LiveLikeImagePollVote | LiveLikeTextQuizAnswer | LiveLikeImageQuizAnswer | LiveLikeTextPredictionVote | LiveLikeImagePredictionVote
+
+"""Base widget type containing common fields shared across"""
+interface LiveLikeWidgetBase implements LiveLikeNode {
+  """Unique identifier of the widget."""
+  id: UUID!
+  """Client identifier associated with this widget."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this widget."""
+  programId: UUID!
+  """Kind of widget (e.g., POST, POLL, PREDICTION, ALERT)."""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g., PENDING, SCHEDULED, PUBLISHED, INFLIGHT).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """List of sponsor IDs associated with this widget."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions and reports."""
+  reportCount: LiveLikeWidgetReportCount
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Whether pubnub is enabled (if applicable)."""
+  pubnubEnabled: Boolean!
+  """
+  Delay (ISO8601) before the widget is published after scheduling (if applicable).
+  """
+  publishDelay: Duration!
+  """
+  Program-scheduled datetime when the widget is expected to appear (if applicable).
+  """
+  programDateTime: DateTimeISO
+}
+
+type LiveLikeWidgetCreator @key(fields: "id") {
+  id: UUID!
+  name: NonEmptyString!
+  customId: NonEmptyString
+}
+
+type LiveLikeWidgetOrder {
+  field: LiveLikeWidgetOrderField
+  order: LiveLikeOrderEnum
+}
+
+type LiveLikeWidgetEdge {
+  node: LiveLikeWidget!
+  cursor: String
+}
+
+type LiveLikeWidgetCollection {
+  edges: [LiveLikeWidgetEdge]
+  page: LiveLikePage!
+  order: LiveLikeWidgetOrder
+}
+
+type LiveLikeWidgetPublish {
+  status: LiveLikeWidgetStatusEnum!
+  scheduledAt: DateTimeISO
+  publishedAt: DateTimeISO
+  """An ISO8601 duration to delay publishing"""
+  publishDelay: String
+  """An ISO8601 date hint to sync widget to video"""
+  programDateTime: DateTimeISO
+}
+
+type LiveLikeWidgetReport implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  programId: UUID!
+  widgetKind: LiveLikeWidgetKindEnum!
+  widgetId: UUID!
+  createdAt: DateTimeISO!
+  comment: String
+  moderatedAt: DateTimeISO
+  moderatedBy: UUID
+  moderatorComment: String
+  status: LiveLikeWidgetReportStatusEnum!
+}
+
+type LiveLikeWidgetReportCount {
+  total: NonNegativeInt!
+  pending: NonNegativeInt!
+  accepted: NonNegativeInt!
+  dismissed: NonNegativeInt!
+}
+
+type LiveLikeWidgetReportEdge implements LiveLikeEdge {
+  node: LiveLikeWidgetReport!
+  cursor: String
+}
+
+type LiveLikeWidgetReportCollection implements LiveLikeConnection {
+  edges: [LiveLikeWidgetReportEdge]
+  page: LiveLikePage!
+}
+
+interface LiveLikeWidgetInteractionBase {
+  id: UUID!
+  profileId: UUID!
+  widgetId: UUID!
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  createdAt: String!
+  rewards: [LiveLikeReward!]
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+}
+
+"""
+DEPRECATED: Use widget specific one 
+(TextPollVote, ImagePollVote)
+"""
+type LiveLikeWidgetInteraction @key(fields: "id") {
+  id: UUID!
+  widgetId: UUID!
+  optionId: UUID!
+  profileId: UUID!
+  createdAt: String!
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  widget: LiveLikeWidget
+  rewards: [LiveLikeReward!]
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+}
+
+type LiveLikeWidgetInteractions {
+  kind: LiveLikeWidgetInteractionEnum!
+  interactions: [LiveLikeWidgetInteractionUnion!]
+}
+
+input LiveLikeWidgetOrderInput {
+  field: LiveLikeWidgetOrderField!
+  order: LiveLikeOrderEnum
+}
+
+interface LiveLikeWidgetInteractionBaseCreateInput {
+  widgetId: UUID!
+}
+
+"""Remove not used in scehma used in resolver"""
+input LiveLikeWidgetInteractionCreateInput {
+  kind: LiveLikeWidgetInteractionEnum!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+"""Remove not used in scehma used in resolver"""
+input LiveLikeWidgetInteractionUpdateInput {
+  id: UUID!
+  kind: LiveLikeWidgetInteractionEnum!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeWidgetGetInput {
+  page: PositiveInt
+  status: LiveLikeWidgetStatusEnum
+  kinds: [LiveLikeWidgetKindEnum!]
+  since: NonEmptyString
+  until: NonEmptyString
+}
+
+input LiveLikeWidgetPublishInput {
+  """ Widget unique ID """
+  widgetId: UUID!
+  """ An ISO8601 duration to delay publishing """
+  publishDelay: String
+  """ An ISO8601 date hint to sync widget to video """
+  programDateTime: DateTimeISO
+}
+
+input LiveLikeWidgetReportInput {
+  widgetKind: LiveLikeWidgetKindEnum!
+  widgetId: UUID!
+  comment: NonEmptyString
+}
+
+input LiveLikeWidgetInteractionsInput {
+  kind: LiveLikeWidgetInteractionEnum!
+  ids: [UUID!]!
+}
+
+input LiveLikeWidgetReportsInput {
+  clientId: NonEmptyString
+  programId: UUID
+  widgetKind: LiveLikeWidgetKindEnum
+  widgetId: UUID
+  createdById: UUID
+  createdSince: DateTimeISO
+  createdUntil: DateTimeISO
+  moderatedById: UUID
+  moderatedSince: DateTimeISO
+  moderatedUntil: DateTimeISO
+  status: LiveLikeWidgetReportStatusEnum
+  page: PositiveInt
+}
+
+input LiveLikeWidgetDeleteInput {
+  id: UUID!
+  kind: LiveLikeWidgetKindEnum!
+}
+
+enum LiveLikePollInteractionEnum {
+  TEXT_POLL
+  IMAGE_POLL
+}
+
+type LiveLikeTextPoll implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  programId: UUID!
+  kind: LiveLikeWidgetKindEnum!
+  createdBy: LiveLikeWidgetCreator!
+  userVote: LiveLikeWidgetInteraction @deprecated(reason: "Introduces cyclic dependency and TextPoll cache issue")
+  createdAt: DateTimeISO!
+  scheduledAt: DateTimeISO
+  publishedAt: DateTimeISO
+  customData: String
+  filteredQuestion: String
+  contentFilter: [String!]
+  status: LiveLikeWidgetStatusEnum!
+  pubnubEnabled: Boolean!
+  uniqueImpressionCount: NonNegativeInt
+  timeout: Duration!
+  """The ISO8601 Date that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options for this prediction"""
+  options: [LiveLikeTextPollOption!]!
+  """List the sponsors ids with this Text Poll."""
+  sponsorIds: [UUID!]
+  """
+  Delay (ISO8601) before the widget is published after scheduling (if applicable).
+  """
+  publishDelay: Duration!
+  """
+  Program-scheduled datetime when the widget is expected to appear (if applicable).
+  """
+  programDateTime: DateTimeISO
+  """Report count information"""
+  reportCount: LiveLikeWidgetReportCount
+}
+
+type LiveLikeTextPollOption implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  translatableFields: [String!]
+  voteCount: Int
+  description: String!
+  filteredDescription: String
+  contentFilter: [String!]
+}
+
+type LiveLikeTextPollVote implements LiveLikeWidgetInteractionBase {
+  id: UUID!
+  """ID of the profile associated with the text poll vote"""
+  profileId: UUID!
+  """ID of the widget associated with the text poll vote"""
+  widgetId: UUID!
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """Text poll widget associated with the text poll vote"""
+  widget: LiveLikeTextPoll!
+  createdAt: String!
+  """Rewards associated with the text poll vote"""
+  rewards: [LiveLikeReward!]
+  """Leaderboard rewards associated with the text poll vote"""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+  """Vote option associated with the text poll vote"""
+  optionId: UUID!
+}
+
+input LiveLikeTextPollOptionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard.
+  """
+  language: Locale!
+  """Description of a poll option"""
+  description: NonEmptyString!
+}
+
+input LiveLikeTextPollLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeTextPollCreateOptionInput {
+  """Description of a poll option"""
+  description: NonEmptyString!
+  """TextPoll option localized data"""
+  localizedData: [LiveLikeTextPollOptionLocalizedInput!]
+}
+
+input LiveLikeTextPollCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: String
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options for this prediction, min 2 and max 4"""
+  options: [LiveLikeTextPollCreateOptionInput!]!
+  """A iso8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """The ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Text Poll. Note that only valid sponsor_ids will be linked to a Text Poll.
+  """
+  sponsorIds: [UUID!]
+  """TextPoll localized data"""
+  localizedData: [LiveLikeTextPollLocalizedInput!]
+}
+
+input LiveLikeTextPollVoteCreateInput {
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeTextPollVoteUpdateInput {
+  id: UUID!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+type LiveLikeImagePoll implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  programId: UUID!
+  kind: LiveLikeWidgetKindEnum!
+  customData: String
+  filteredQuestion: String
+  contentFilter: [String!]
+  createdBy: LiveLikeWidgetCreator!
+  userVote: LiveLikeWidgetInteraction @deprecated(reason: "Introduces cyclic dependency and ImagePoll cache issue")
+  createdAt: DateTimeISO!
+  scheduledAt: DateTimeISO
+  publishedAt: DateTimeISO
+  status: LiveLikeWidgetStatusEnum!
+  pubnubEnabled: Boolean!
+  uniqueImpressionCount: NonNegativeInt
+  timeout: Duration!
+  """The ISO8601 Date that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options for this prediction"""
+  options: [LiveLikeImagePollOption!]!
+  """List the sponsors ids with this Image Poll."""
+  sponsorIds: [UUID!]
+  """
+  Delay (ISO8601) before the widget is published after scheduling (if applicable).
+  """
+  publishDelay: Duration!
+  """
+  Program-scheduled datetime when the widget is expected to appear (if applicable).
+  """
+  programDateTime: DateTimeISO
+  """Report count information"""
+  reportCount: LiveLikeWidgetReportCount
+}
+
+type LiveLikeImagePollOption implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  translatableFields: [String!]
+  voteCount: Int
+  imageUrl: URL!
+  description: String!
+  filteredDescription: String
+  contentFilter: [String!]
+}
+
+type LiveLikeImagePollVote implements LiveLikeWidgetInteractionBase {
+  id: UUID!
+  """ID of the profile associated with the image poll vote"""
+  profileId: UUID!
+  """ID of the widget associated with the image poll vote"""
+  widgetId: UUID!
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """Image poll widget associated with the image poll vote"""
+  widget: LiveLikeImagePoll!
+  createdAt: String!
+  """Rewards associated with the image poll vote"""
+  rewards: [LiveLikeReward!]
+  """Leaderboard rewards associated with the image poll vote"""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+  """Vote option associated with the image poll vote"""
+  optionId: UUID!
+}
+
+input LiveLikeImagePollOptionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard.
+  """
+  language: Locale!
+  """Description of a poll option"""
+  description: NonEmptyString!
+}
+
+input LiveLikeImagePollLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeImagePollCreateOptionInput {
+  """Description of a poll option"""
+  description: NonEmptyString!
+  """Image URL of a poll option"""
+  imageURL: URL!
+  """ImagePoll option localized data"""
+  localizedData: [LiveLikeImagePollOptionLocalizedInput!]
+}
+
+input LiveLikeImagePollCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: String
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options for this prediction, min 2 and max 4"""
+  options: [LiveLikeImagePollCreateOptionInput!]!
+  """A iso8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """The ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Image Poll. Note that only valid sponsor_ids will be linked to a Image Poll.
+  """
+  sponsorIds: [UUID!]
+  """ImagePoll localized data"""
+  localizedData: [LiveLikeImagePollLocalizedInput!]
+}
+
+input LiveLikeImagePollVoteCreateInput {
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeImagePollVoteUpdateInput {
+  id: UUID!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+"""
+DEPRECATED: Use widget specific one 
+(TextPollVoteCreateInput, ImagePollVoteCreateInput)
+"""
+input LiveLikePollVoteCreateInput {
+  kind: LiveLikePollInteractionEnum!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+"""
+DEPRECATED: Use widget specific one 
+(TextPollVoteUpdateInput, ImagePollVoteUpdateInput)
+"""
+input LiveLikePollVoteUpdateInput {
+  id: UUID!
+  kind: LiveLikePollInteractionEnum!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+type LiveLikeRichPost implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  """Rich Post related program id"""
+  programId: UUID!
+  kind: LiveLikeWidgetKindEnum!
+  """Title of the post"""
+  title: String
+  """HTML content of the post"""
+  content: String
+  customData: String
+  createdBy: LiveLikeWidgetCreator!
+  status: LiveLikeWidgetStatusEnum!
+  timeout: Duration!
+  """Whether pubnub is enabled (if applicable)."""
+  pubnubEnabled: Boolean!
+  uniqueImpressionCount: NonNegativeInt
+  """The ISO8601 Date that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  filteredTitle: String
+  filteredContent: String
+  contentFilter: [String!]
+  """List the sponsors ids with this RichPost."""
+  sponsorIds: [UUID!]
+  """
+  Delay (ISO8601) before the widget is published after scheduling (if applicable).
+  """
+  publishDelay: Duration!
+  """
+  Program-scheduled datetime when the widget is expected to appear (if applicable).
+  """
+  programDateTime: DateTimeISO
+  """Report count information"""
+  reportCount: LiveLikeWidgetReportCount
+  createdAt: DateTimeISO!
+  scheduledAt: DateTimeISO
+  publishedAt: DateTimeISO
+}
+
+input LiveLikeRichPostLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Title of the post"""
+  title: NonEmptyString
+  """HTML content of the post"""
+  content: NonEmptyString!
+}
+
+input LiveLikeRichPostCreateInput {
+  """The program to create the rich post inside of"""
+  programId: UUID!
+  """Title of the post"""
+  title: NonEmptyString
+  """HTML content of the post"""
+  content: NonEmptyString!
+  """A free-form field used for custom behaviors"""
+  customData: String
+  """A iso8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """The ISO8601 Date that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Text Poll. Note that only valid sponsor_ids will be linked to a Text Poll.
+  """
+  sponsorIds: [UUID!]
+  """RichPost localized data"""
+  localizedData: [LiveLikeRichPostLocalizedInput!]
+}
+
+""" Represents a choice in a text quiz. Includes correctness, user response count, and localization metadata.
+"""
+type LiveLikeTextQuizChoice implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier for the choice."""
+  id: UUID!
+  """Description of the choice."""
+  description: String!
+  """Indicates whether this choice is the correct answer"""
+  isCorrect: Boolean!
+  """Number of users who selected this choice."""
+  answerCount: NonNegativeInt!
+  """List of fields in this object that support translation"""
+  translatableFields: [String!]
+}
+
+""" Represents a choice in a image quiz. Includes correctness, user response count, and localization metadata.
+"""
+type LiveLikeImageQuizChoice implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier for the choice."""
+  id: UUID!
+  """Description of the choice."""
+  description: String!
+  """Indicates whether this choice is the correct answer"""
+  isCorrect: Boolean!
+  """URL of the image associated with this choice"""
+  imageUrl: URL!
+  """Number of users who selected this choice."""
+  answerCount: NonNegativeInt!
+  """List of fields in this object that support translation"""
+  translatableFields: [String!]
+}
+
+"""Represents an text quiz widget."""
+type LiveLikeTextQuiz implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the text quiz."""
+  id: UUID!
+  """Client identifier associated with this quiz."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this quiz."""
+  programId: UUID!
+  """The question for the quiz to be made"""
+  question: NonEmptyString!
+  """List of choices available for this quiz."""
+  choices: [LiveLikeTextQuizChoice!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Text Quiz."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the quiz is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+type LiveLikeTextQuizAnswer implements LiveLikeWidgetInteractionBase @key(fields: "id") {
+  """Unique identifier of the text quiz answer."""
+  id: UUID!
+  """ID of the profile who submitted the answer."""
+  profileId: UUID!
+  """ID of the widget this answer belongs to."""
+  widgetId: UUID!
+  """Type of widget interaction."""
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """The text quiz widget associated with this answer."""
+  widget: LiveLikeTextQuiz!
+  """Timestamp when the answer was created."""
+  createdAt: String!
+  """List of rewards granted for this answer."""
+  rewards: [LiveLikeReward!]
+  """List of leaderboard rewards associated with this answer."""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+  """Identifier of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+"""Represents an image quiz widget."""
+type LiveLikeImageQuiz implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the image quiz."""
+  id: UUID!
+  """Client identifier associated with this quiz."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this quiz."""
+  programId: UUID!
+  """The question for the quiz to be made"""
+  question: NonEmptyString!
+  """List of choices available for this quiz."""
+  choices: [LiveLikeImageQuizChoice!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Image Quiz."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the quiz is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+type LiveLikeImageQuizAnswer implements LiveLikeWidgetInteractionBase @key(fields: "id") {
+  """Unique identifier of the image quiz answer."""
+  id: UUID!
+  """ID of the profile who submitted the answer."""
+  profileId: UUID!
+  """ID of the widget instance this answer belongs to."""
+  widgetId: UUID!
+  """Type of widget interaction."""
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """The image quiz widget associated with this answer."""
+  widget: LiveLikeImageQuiz!
+  """Timestamp when the answer was created."""
+  createdAt: String!
+  """List of rewards granted for this answer."""
+  rewards: [LiveLikeReward!]
+  """List of leaderboard rewards associated with this answer."""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+  """Identifier of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+input LiveLikeTextQuizChoiceLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Description of the choice"""
+  description: NonEmptyString!
+}
+
+"""Represents a choice option for a text quiz."""
+input LiveLikeTextQuizCreateChoiceInput {
+  """Description of the choice."""
+  description: NonEmptyString!
+  """Indicates whether this choice is the correct answer."""
+  isCorrect: Boolean!
+  """TextQuiz choice localized data"""
+  localizedData: [LiveLikeTextQuizChoiceLocalizedInput!]
+}
+
+input LiveLikeTextQuizAnswerCreateInput {
+  """ID of the widget instance for which the answer is submitted."""
+  widgetId: UUID!
+  """ID of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+input LiveLikeTextQuizAnswerUpdateInput {
+  """ID of the text quiz answer to update."""
+  id: UUID!
+  """ID of the widget instance for which the answer is submitted."""
+  widgetId: UUID!
+  """ID of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+input LiveLikeImageQuizChoiceLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Description of the choice"""
+  description: NonEmptyString!
+}
+
+"""Represents a choice option for a image quiz."""
+input LiveLikeImageQuizCreateChoiceInput {
+  """Description of the choice."""
+  description: NonEmptyString!
+  """Indicates whether this choice is the correct answer"""
+  isCorrect: Boolean!
+  """URL of the image associated with this choice"""
+  imageUrl: URL!
+  """ImageQuiz choice localized data"""
+  localizedData: [LiveLikeImageQuizChoiceLocalizedInput!]
+}
+
+input LiveLikeTextQuizLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeTextQuizCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: NonEmptyString
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of choices for this prediction, min 2 and max 4"""
+  choices: [LiveLikeTextQuizCreateChoiceInput!]!
+  """A iso8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """The ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Text Quiz. Note that only valid sponsor_ids will be linked to a Text Quiz.
+  """
+  sponsorIds: [UUID!]
+  """TextQuiz localized data"""
+  localizedData: [LiveLikeTextQuizLocalizedInput!]
+}
+
+input LiveLikeImageQuizLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeImageQuizCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: NonEmptyString
+  """ The prompt or question for the prediction to be made """
+  question: NonEmptyString!
+  """ List of choices for this quiz"""
+  choices: [LiveLikeImageQuizCreateChoiceInput!]!
+  """A iso8601 duration hint for when a Widget should be timed out """
+  timeout: Duration
+  """ The ISO8601 DateTime that the widget will stop accepting interactions 
+  """
+  interactiveUntil: DateTimeISO
+  """ Video playback time in milliseconds """
+  playbackTimeMs: NonNegativeInt
+  """ An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """ Links the sponsors with this Image Quiz. Note that only valid sponsor_ids will be linked to a Image Quiz.
+  """
+  sponsorIds: [UUID!]
+  """ImageQuiz localized data"""
+  localizedData: [LiveLikeImageQuizLocalizedInput!]
+}
+
+input LiveLikeImageQuizAnswerCreateInput {
+  """ID of the widget instance for which the answer is submitted."""
+  widgetId: UUID!
+  """ID of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+input LiveLikeImageQuizAnswerUpdateInput {
+  """ID identifier of the image quiz answer to update."""
+  id: UUID!
+  """ID of the widget instance for which the answer is submitted."""
+  widgetId: UUID!
+  """ID of the choice selected by the user."""
+  choiceId: UUID!
+}
+
+""" Represents a option in a text prediction. Includes correctness."""
+type LiveLikeTextPredictionOption implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier for the option."""
+  id: UUID!
+  """Description of the option."""
+  description: String!
+  """Indicates whether this option is the correct"""
+  isCorrect: Boolean!
+  """Unique identifier for the reward Item Id."""
+  rewardItemId: UUID
+  """Number of users who selected this option."""
+  voteCount: NonNegativeInt!
+  """Reward amount for the prediction option ."""
+  rewardItemAmount: NonNegativeInt
+  """List of all earned rewards"""
+  earnableRewards: [LiveLikeReward!]
+  """List of fields in this object that support translation"""
+  translatableFields: [String!]
+}
+
+""" Represents a option in a image prediction. Includes correctness, user response count, and localization metadata.
+"""
+type LiveLikeImagePredictionOption implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier for the image option."""
+  id: UUID!
+  """Description of the image prediction option."""
+  description: String!
+  """Indicates whether this option is the correct answer"""
+  isCorrect: Boolean!
+  """URL of the image associated with this option"""
+  imageUrl: URL!
+  """Unique identifier for the reward Item Id."""
+  rewardItemId: UUID
+  """Number of users who selected this option."""
+  voteCount: NonNegativeInt!
+  """Reward amount for the prediction option ."""
+  rewardItemAmount: NonNegativeInt
+  """List of all earned rewards"""
+  earnableRewards: [LiveLikeReward!]
+  """List of fields in this object that support translation"""
+  translatableFields: [String!]
+}
+
+"""Represents an text prediction followup."""
+type LiveLikeTextPredictionFollowUp implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the text prediction followup."""
+  id: UUID!
+  """Client identifier associated with this prediction followup."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this prediction."""
+  programId: UUID!
+  """Text Prediction identifier associated with this prediction followup."""
+  textPredictionId: UUID!
+  """Optional Correct option id of the prediction."""
+  correctOptionId: UUID
+  """The question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options available for this prediction."""
+  options: [LiveLikeTextPredictionOption!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Text Prediction."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the prediction is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+"""Represents an text prediction widget."""
+type LiveLikeTextPrediction implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the text prediction."""
+  id: UUID!
+  """Client identifier associated with this prediction."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this prediction."""
+  programId: UUID!
+  """The question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options available for this prediction."""
+  options: [LiveLikeTextPredictionOption!]!
+  """List of all follow ups available for this prediction."""
+  followUps: [LiveLikeTextPredictionFollowUp!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Optional confirmation message for the widget."""
+  confirmationMessage: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Text Prediction."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the prediction is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+"""Represents an image prediction followup widget."""
+type LiveLikeImagePredictionFollowUp implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the image prediction."""
+  id: UUID!
+  """Client identifier associated with this prediction."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this prediction."""
+  programId: UUID!
+  """Image Prediction identifier associated with this prediction followup."""
+  imagePredictionId: UUID!
+  """Optional Correct option id of the prediction."""
+  correctOptionId: UUID
+  """The question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options available for this prediction."""
+  options: [LiveLikeImagePredictionOption!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Image Prediction."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the prediction is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+"""Represents an image prediction widget."""
+type LiveLikeImagePrediction implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the image prediction."""
+  id: UUID!
+  """Client identifier associated with this prediction."""
+  clientId: NonEmptyString!
+  """Program identifier associated with this prediction."""
+  programId: UUID!
+  """The question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options available for this prediction."""
+  options: [LiveLikeImagePredictionOption!]!
+  """List of all follow ups available for this prediction."""
+  followUps: [LiveLikeImagePredictionFollowUp!]!
+  """Optional custom metadata for the widget."""
+  customData: String
+  """Optional confirmation message for the widget."""
+  confirmationMessage: String
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Total number of unique users who interacted with the widget."""
+  uniqueImpressionCount: NonNegativeInt
+  """List of sponsor IDs associated with this Image Prediction."""
+  sponsorIds: [UUID!]
+  """Contains count-based metrics such as interactions."""
+  reportCount: LiveLikeWidgetReportCount
+  """Additional widget attributes in key-value format."""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """Information about the user that created the widget."""
+  createdBy: LiveLikeWidgetCreator!
+  """The ISO8601 DateTime when the widget stops accepting interactions."""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds."""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive."""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling."""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the prediction is expected to appear."""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created."""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget."""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published."""
+  publishedAt: DateTimeISO
+}
+
+type LiveLikeTextPredictionVote implements LiveLikeWidgetInteractionBase @key(fields: "id") {
+  """Unique ID of the text prediction vote"""
+  id: UUID!
+  """ID of the profile associated with the text prediction vote"""
+  profileId: UUID!
+  """ID of the widget associated with the text prediction vote"""
+  widgetId: UUID!
+  """Kind of the widget Interaction"""
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """Text prediction widget associated with the text prediction vote"""
+  widget: LiveLikeTextPrediction!
+  """Timestamp when the widget was created."""
+  createdAt: String!
+  """Vote option associated with the text prediction vote"""
+  optionId: UUID!
+  """Claim token for the text prediction Vote"""
+  claimToken: JWT!
+  """List of rewards granted for this answer."""
+  rewards: [LiveLikeReward!]
+  """Leaderboard rewards associated with the text prediction vote"""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+}
+
+type LiveLikeImagePredictionVote implements LiveLikeWidgetInteractionBase @key(fields: "id") {
+  """Unique ID of the image prediction vote"""
+  id: UUID!
+  """ID of the profile associated with the image prediction vote"""
+  profileId: UUID!
+  """ID of the widget associated with the image prediction vote"""
+  widgetId: UUID!
+  """Kind of the widget Interaction"""
+  widgetKind: LiveLikeWidgetInteractionEnum!
+  """Image Prediction widget associated with the image prediction vote"""
+  widget: LiveLikeImagePrediction!
+  """Timestamp when the widget was created."""
+  createdAt: String!
+  """Rewards associated with the image prediction vote"""
+  rewards: [LiveLikeReward!]
+  """Vote option associated with the image prediction vote"""
+  optionId: UUID!
+  """Claim token for the image prediction Vote"""
+  claimToken: JWT!
+  """Leaderboard rewards associated with the image prediction vote"""
+  leaderboardRewards: [LiveLikeLeaderboardReward!]
+}
+
+input LiveLikeTextPredictionOptionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Description of the option"""
+  description: NonEmptyString!
+}
+
+"""Represents a option for a text prediction."""
+input LiveLikeTextPredictionCreateOptionInput {
+  """Description of the prediction."""
+  description: NonEmptyString!
+  """Indicates whether this option is the correct option."""
+  isCorrect: Boolean
+  """Unique identifier for the reward Item Id."""
+  rewardItemId: UUID
+  """Reward amount for the prediction option ."""
+  rewardItemAmount: NonNegativeInt
+  """TextPrediction option localized data"""
+  localizedData: [LiveLikeTextPredictionOptionLocalizedInput!]
+}
+
+input LiveLikeImagePredictionOptionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """Description of the option"""
+  description: NonEmptyString!
+}
+
+"""Represents a option for a image prediction."""
+input LiveLikeImagePredictionCreateOptionInput {
+  """Description of the option."""
+  description: NonEmptyString!
+  """Indicates whether this option is the correct answer"""
+  isCorrect: Boolean
+  """URL of the image associated with this option"""
+  imageUrl: URL!
+  """Unique identifier for the reward Item Id."""
+  rewardItemId: UUID
+  """Reward amount for the prediction option ."""
+  rewardItemAmount: NonNegativeInt
+  """ImagePrediction option localized data"""
+  localizedData: [LiveLikeImagePredictionOptionLocalizedInput!]
+}
+
+input LiveLikeTextPredictionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeTextPredictionCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: NonEmptyString
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+  """List of options for this prediction, min 2 and max 4"""
+  options: [LiveLikeTextPredictionCreateOptionInput!]!
+  """Optional confirmation message for the widget."""
+  confirmationMessage: String
+  """A iso8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """The ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Text Prediction. Note that only valid sponsor_ids will be linked to a Text Prediction.
+  """
+  sponsorIds: [UUID!]
+  """TextPrediction localized data"""
+  localizedData: [LiveLikeTextPredictionLocalizedInput!]
+}
+
+input LiveLikeTextPredictionFollowUpCreateInput {
+  """ID of the text prediction to create the followup prediction for"""
+  textPredictionId: UUID!
+  """
+  ID of the correct text prediction option to create the followup prediction for
+  """
+  correctOptionId: NonEmptyString
+  """
+  Links the sponsors with this Text Prediction. Note that only valid sponsor_ids will be linked to a Text Prediction.
+  """
+  sponsorIds: [UUID!]
+}
+
+input LiveLikeImagePredictionLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47  (RFC 5646 ) standard.
+  """
+  language: Locale!
+  """The prompt or question for the prediction to be made"""
+  question: NonEmptyString!
+}
+
+input LiveLikeImagePredictionCreateInput {
+  """ID of the program to create the prediction for"""
+  programId: UUID!
+  """A free-form field used for custom behaviors"""
+  customData: NonEmptyString
+  """ The prompt or question for the prediction to be made """
+  question: NonEmptyString!
+  """ List of options for this prediction"""
+  options: [LiveLikeImagePredictionCreateOptionInput!]!
+  """Optional confirmation message for the widget."""
+  confirmationMessage: String
+  """A iso8601 duration hint for when a Widget should be timed out """
+  timeout: Duration
+  """ The ISO8601 DateTime that the widget will stop accepting interactions 
+  """
+  interactiveUntil: DateTimeISO
+  """ Video playback time in milliseconds """
+  playbackTimeMs: NonNegativeInt
+  """ An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """ Links the sponsors with this Image Prediction. Note that only valid sponsor_ids will be linked to a Image Prediction.
+  """
+  sponsorIds: [UUID!]
+  """Image Prediction localized data"""
+  localizedData: [LiveLikeImagePredictionLocalizedInput!]
+}
+
+input LiveLikeImagePredictionFollowUpCreateInput {
+  """ID of the text prediction to create the follow up prediction."""
+  imagePredictionId: UUID!
+  """
+  ID of the correct text prediction option to create the followup prediction.
+  """
+  correctOptionId: NonEmptyString
+  """
+  Links the sponsors with this Text Prediction. Note that only valid sponsor_ids will be linked to a Text Prediction.
+  """
+  sponsorIds: [UUID!]
+}
+
+input LiveLikeTextPredictionVoteCreateInput {
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeTextPredictionVoteUpdateInput {
+  id: UUID!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeImagePredictionVoteCreateInput {
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+input LiveLikeImagePredictionVoteUpdateInput {
+  id: UUID!
+  widgetId: UUID!
+  optionId: UUID!
+}
+
+type LiveLikeAlert implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the alert"""
+  id: UUID!
+  """Client identifier associated with this alert"""
+  clientId: NonEmptyString!
+  """Program identifier associated with this alert"""
+  programId: UUID!
+  """Information about the user that created the widget"""
+  createdBy: LiveLikeWidgetCreator!
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Optional custom metadata for the widget"""
+  customData: String
+  """Additional widget attributes in key-value format"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """List of sponsor IDs associated with this Alert"""
+  sponsorIds: [UUID!]
+  """Total number of unique users who interacted with the widget"""
+  uniqueImpressionCount: NonNegativeInt
+  """Contains count-based metrics such as interactions"""
+  reportCount: LiveLikeWidgetReportCount
+  """ISO8601 DateTime when the widget stops accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive"""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling"""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the alert is expected to appear"""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created"""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget"""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published"""
+  publishedAt: DateTimeISO
+  """title of the alert"""
+  title: NonEmptyString
+  """text of the alert"""
+  text: NonEmptyString
+  """url of the body image"""
+  imageUrl: URL
+  """url of the link"""
+  linkUrl: URL
+  """label describing the link"""
+  linkLabel: NonEmptyString
+}
+
+type LiveLikeVideoAlert implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the video alert"""
+  id: UUID!
+  """Client identifier associated with this video alert"""
+  clientId: NonEmptyString!
+  """Program identifier associated with this video alert"""
+  programId: UUID!
+  """Information about the user that created the widget"""
+  createdBy: LiveLikeWidgetCreator!
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Optional custom metadata for the widget"""
+  customData: String
+  """Additional widget attributes in key-value format"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """List of sponsor IDs associated with this video alert"""
+  sponsorIds: [UUID!]
+  """Total number of unique users who interacted with the widget"""
+  uniqueImpressionCount: NonNegativeInt
+  """Contains count-based metrics such as interactions"""
+  reportCount: LiveLikeWidgetReportCount
+  """ISO8601 DateTime when the widget stops accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive"""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling"""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the video alert is expected to appear"""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created"""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget"""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published"""
+  publishedAt: DateTimeISO
+  """title of the video alert"""
+  title: NonEmptyString
+  """text of the video alert"""
+  text: NonEmptyString
+  """url of the video file """
+  videoUrl: URL!
+  """url of the link"""
+  linkUrl: URL
+  """label describing the link"""
+  linkLabel: NonEmptyString
+}
+
+input LiveLikeAlertLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard 
+  """
+  language: Locale!
+  """title of the alert"""
+  title: NonEmptyString
+  """text of the alert"""
+  text: NonEmptyString
+  """label describing the link"""
+  linkLabel: NonEmptyString
+}
+
+input LiveLikeVideoAlertLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard 
+  """
+  language: Locale!
+  """title of the video alert"""
+  title: NonEmptyString
+  """text of the video alert"""
+  text: NonEmptyString
+  """label describing the link"""
+  linkLabel: NonEmptyString
+}
+
+input LiveLikeAlertCreateInput {
+  """ ID of the program to create the alert"""
+  programId: UUID!
+  """free-form field used for custom behaviors"""
+  customData: String
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Alert. 
+  Note only valid sponsor ids will be linked to Alert.
+  """
+  sponsorIds: [UUID!]
+  """ISO8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """title of the alert"""
+  title: NonEmptyString
+  """text of the alert"""
+  text: NonEmptyString
+  """url of the body image"""
+  imageUrl: URL
+  """url of the link"""
+  linkUrl: URL
+  """label describing the link"""
+  linkLabel: NonEmptyString
+  """Alert localized data"""
+  localizedData: [LiveLikeAlertLocalizedInput!]
+}
+
+input LiveLikeVideoAlertCreateInput {
+  """ ID of the program to create the video alert"""
+  programId: UUID!
+  """free-form field used for custom behaviors"""
+  customData: String
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this Alert. 
+  Note only valid sponsor ids will be linked to video alert.
+  """
+  sponsorIds: [UUID!]
+  """ISO8601 duration hint for when a Widget should be timed out"""
+  timeout: Duration
+  """ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """title of the video alert"""
+  title: NonEmptyString
+  """text of the video alert"""
+  text: NonEmptyString
+  """url of the video file """
+  videoUrl: URL!
+  """url of the link"""
+  linkUrl: URL
+  """label describing the link"""
+  linkLabel: NonEmptyString
+  """Video Alert localized data"""
+  localizedData: [LiveLikeVideoAlertLocalizedInput!]
+}
+
+type LiveLikeSocialEmbedItem implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the social embed item"""
+  id: UUID!
+  """oEmbed url of social embed item https://oembed.com/"""
+  oEmbedUrl: URL
+  """oEmbed meta of social embed item https://oembed.com/"""
+  oEmbedMeta: JSONObject
+}
+
+type LiveLikeSocialEmbed implements LiveLikeWidgetBase & LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the widget"""
+  id: UUID!
+  """Client identifier associated with this widget"""
+  clientId: NonEmptyString!
+  """Program identifier associated with this widget"""
+  programId: UUID!
+  """Information about the user that created the widget"""
+  createdBy: LiveLikeWidgetCreator!
+  """Kind of widget"""
+  kind: LiveLikeWidgetKindEnum!
+  """
+  Current status of the widget (e.g.,  PENDING, SCHEDULED, PUBLISHED, INFLIGHT etc).
+  """
+  status: LiveLikeWidgetStatusEnum!
+  """Whether pubnub is enabled."""
+  pubnubEnabled: Boolean!
+  """Optional custom metadata for the widget"""
+  customData: String
+  """Additional widget attributes in key-value format"""
+  widgetAttributes: [LiveLikeKeyValuePair!]
+  """List of sponsor IDs associated with this widget"""
+  sponsorIds: [UUID!]
+  """Total number of unique users who interacted with the widget"""
+  uniqueImpressionCount: NonNegativeInt
+  """Contains count-based metrics such as interactions"""
+  reportCount: LiveLikeWidgetReportCount
+  """ISO8601 DateTime when the widget stops accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time at which the widget appears, in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """Duration (ISO8601) for which the widget remains interactive"""
+  timeout: Duration!
+  """Delay (ISO8601) before the widget is published after scheduling"""
+  publishDelay: Duration!
+  """Program-scheduled datetime when the widget is expected to appear"""
+  programDateTime: DateTimeISO
+  """Timestamp when the widget was created"""
+  createdAt: DateTimeISO!
+  """Scheduled datetime for the widget"""
+  scheduledAt: DateTimeISO
+  """Datetime when the widget was actually published"""
+  publishedAt: DateTimeISO
+  """comment of the social embed widget"""
+  comment: NonEmptyString
+  """social oEmbed item"""
+  oEmbedItem: LiveLikeSocialEmbedItem
+}
+
+input LiveLikeSocialEmbedLocalizedInput {
+  """
+  Localized language a string that conforms to the BCP-47 (RFC 5646) standard 
+  """
+  language: Locale!
+  """comment of the social embed widget"""
+  comment: NonEmptyString!
+}
+
+input LiveLikeSocialEmbedCreateInput {
+  """ID of the program to create the widget"""
+  programId: UUID!
+  """free-form field used for custom behaviors"""
+  customData: String
+  """An array of key value pairs used for custom behaviors"""
+  widgetAttributes: [LiveLikeKeyValuePairInput!]
+  """
+  Links the sponsors with this widget. 
+  Note only valid sponsor ids will be linked to widget.
+  """
+  sponsorIds: [UUID!]
+  """ISO8601 duration hint for when a widget should be timed out"""
+  timeout: Duration
+  """ISO8601 DateTime that the widget will stop accepting interactions"""
+  interactiveUntil: DateTimeISO
+  """Video playback time in milliseconds"""
+  playbackTimeMs: NonNegativeInt
+  """comment of the social embed widget"""
+  comment: NonEmptyString
+  """oEmbed url of social embed item https://oembed.com/"""
+  oEmbedUrl: URL!
+  """Social embed localized data"""
+  localizedData: [LiveLikeSocialEmbedLocalizedInput!]
+}
+
+type LiveLikeEmoji implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  name: NonEmptyString!
+  file: URL!
+  mimeType: NonEmptyString!
+}
+
+type LiveLikeEmojiCount implements LiveLikeNode {
+  id: UUID!
+  reactionsCount: NonNegativeInt!
+}
+
+type LiveLikeReaction implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  count: NonNegativeInt!
+  userReactionId: UUID!
+}
+
+type LiveLikeReactions {
+  reactions: [LiveLikeReaction!]
+  targetId: NonEmptyString!
+}
+
+type LiveLikeReactionPack implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  name: NonEmptyString!
+  emojis: [LiveLikeEmoji]
+}
+
+type LiveLikeReactionPackEdge implements LiveLikeEdge {
+  node: LiveLikeReactionPack!
+  cursor: String
+}
+
+type LiveLikeReactionPackCollection implements LiveLikeConnection {
+  edges: [LiveLikeReactionPackEdge]
+  page: LiveLikePage!
+}
+
+input LiveLikeReactionPacksGetInput {
+  clientId: NonEmptyString!
+  page: PositiveInt
+}
+
+type LiveLikeReactionSpace implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  targetGroupId: NonEmptyString!
+  name: NonEmptyString
+  reactionPackIds: [UUID!]
+  reactionSpaceChannel: NonEmptyString
+  createdBy: UUID!
+}
+
+type LiveLikeReactionSpacePatch {
+  name: NonEmptyString
+  reactionPackIds: [UUID!]!
+}
+
+type LiveLikeReactionSpaceEdge implements LiveLikeEdge {
+  node: LiveLikeReactionSpace!
+  cursor: String
+}
+
+type LiveLikeReactionSpaceCollection implements LiveLikeConnection {
+  edges: [LiveLikeReactionSpaceEdge]
+  page: LiveLikePage!
+}
+
+type LiveLikeReactionSpaceCount {
+  reactionSpaceId: UUID!
+  targetGroupId: NonEmptyString!
+  reactionsCount: NonNegativeInt!
+  emojiCounts: [LiveLikeEmojiCount!]
+}
+
+input LiveLikeReactionSpaceGetInput {
+  clientId: NonEmptyString!
+  reactionSpaceId: UUID
+  targetGroupId: NonEmptyString
+  page: PositiveInt
+}
+
+input LiveLikeReactionSpaceCreateInput {
+  clientId: NonEmptyString!
+  targetGroupId: NonEmptyString!
+  name: NonEmptyString
+  reactionPackIds: [UUID!]
+}
+
+input LiveLikeReactionSpaceUpdateInput {
+  id: UUID!
+  name: NonEmptyString
+  reactionPackIds: [UUID!]!
+}
+
+input LiveLikeReactionSpaceDeleteInput {
+  id: UUID!
+  clientId: NonEmptyString!
+}
+
+input LiveLikeReactionSpacesCountInput {
+  clientId: NonEmptyString!
+  reactionSpaceIds: [UUID!]!
+}
+
+type LiveLikeUserReaction implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  targetId: NonEmptyString!
+  reactionId: UUID!
+  reactionSpaceId: UUID!
+  customData: NonEmptyString
+  reactedById: UUID!
+  createdAt: NonEmptyString!
+}
+
+type LiveLikeUserReactionEdge implements LiveLikeEdge {
+  node: LiveLikeUserReaction!
+  cursor: String
+}
+
+type LiveLikeUserReactionCollection implements LiveLikeConnection {
+  edges: [LiveLikeUserReactionEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeUserReactionsGetInput {
+  clientId: NonEmptyString!
+  targetId: [NonEmptyString!]
+  targetGroupId: NonEmptyString
+  reactionId: UUID
+  reactionSpaceIds: [UUID!]
+  reactedById: UUID
+  page: PositiveInt
+  pageSize: PositiveInt
+}
+
+input LiveLikeUserReactionCreateInput {
+  targetId: NonEmptyString!
+  reactionId: UUID!
+  reactionSpaceId: UUID!
+  customData: NonEmptyString
+}
+
+type LiveLikeUserReactionCountEdge {
+  node: LiveLikeReactions!
+  cursor: String
+}
+
+type LiveLikeUserReactionCountCollection {
+  edges: [LiveLikeUserReactionCountEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeUserReactionCountsGetInput {
+  page: PositiveInt
+  reactionSpaceId: UUID!
+  targetId: [NonEmptyString!]
+}
+
+enum LiveLikeContentFilterEnum {
+  FILTERED
+  NONE
+}
+
+type LiveLikeCommentBoard implements LiveLikeNode @key(fields: "id") @key(fields: "clientId customId") {
+  id: UUID!
+  clientId: NonEmptyString!
+  customId: String
+  customData: String
+  title: String
+  contentFilter: LiveLikeContentFilterEnum!
+  description: String
+  allowComments: Boolean!
+  repliesDepth: PositiveInt!
+  commentsCount: NonNegativeInt!
+  createdById: UUID!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeCommentBoardEdge implements LiveLikeEdge {
+  node: LiveLikeCommentBoard!
+  cursor: String
+}
+
+type LiveLikeCommentBoardCollection implements LiveLikeConnection {
+  edges: [LiveLikeCommentBoardEdge]
+  page: LiveLikePage!
+}
+
+type LiveLikeCommentBoardCount implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  commentsCount: NonNegativeInt!
+  topLevelCommentsCount: NonNegativeInt!
+}
+
+type LiveLikeComment implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  parentCommentId: UUID
+  commentBoardId: UUID!
+  authorId: UUID!
+  text: String
+  commentDepth: NonNegativeInt!
+  customData: NonEmptyString
+  repliesCount: NonNegativeInt!
+  createdAt: DateTimeISO!
+  isReported: Boolean!
+  commentReportsCount: NonNegativeInt!
+  isDeleted: Boolean!
+  deletedBy: UUID
+  deletedAt: DateTimeISO
+  author: LiveLikeProfile!
+}
+
+type LiveLikeCommentEdge implements LiveLikeEdge {
+  node: LiveLikeComment!
+  cursor: String
+}
+
+type LiveLikeCommentCollection implements LiveLikeConnection {
+  edges: [LiveLikeCommentEdge]
+  page: LiveLikePage!
+}
+
+enum LiveLikeCommentReportStatusEnum {
+  PENDING
+  DISMISSED
+}
+
+type LiveLikeCommentReport implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  commentBoardId: UUID!
+  commentId: UUID!
+  description: String
+  reportedById: UUID!
+  reportStatus: LiveLikeCommentReportStatusEnum!
+  reportedAt: DateTimeISO!
+  comment: LiveLikeComment!
+}
+
+type LiveLikeCommentReportEdge implements LiveLikeEdge {
+  node: LiveLikeCommentReport!
+  cursor: String
+}
+
+type LiveLikeCommentReportCollection implements LiveLikeConnection {
+  edges: [LiveLikeCommentReportEdge]
+  page: LiveLikePage!
+}
+
+input LiveLikeCommentBoardCreateInput {
+  customId: NonEmptyString
+  title: NonEmptyString
+  description: NonEmptyString
+  contentFilter: LiveLikeContentFilterEnum
+  allowComments: Boolean
+  repliesDepth: PositiveInt
+  customData: NonEmptyString
+}
+
+input LiveLikeCommentBoardUpdateInput {
+  id: UUID!
+  customId: NonEmptyString
+  title: NonEmptyString
+  contentFilter: LiveLikeContentFilterEnum
+  description: NonEmptyString
+  allowComments: Boolean
+  repliesDepth: PositiveInt
+  customData: NonEmptyString
+}
+
+input LiveLikeCommentBoardsGetInput {
+  page: PositiveInt
+  clientId: NonEmptyString!
+  customId: NonEmptyString
+  commentBoardIds: [UUID!]
+}
+
+input LiveLikeCommentBoardsCountGetInput {
+  commentBoardIds: [UUID!]!
+}
+
+input LiveLikeCommentsGetInput {
+  page: PositiveInt
+  commentBoardId: UUID!
+}
+
+input LiveLikeCommentRepliesGetInput {
+  page: PositiveInt
+  commentBoardId: UUID!
+  parentCommentId: UUID!
+  withoutDeletedThread: Boolean
+}
+
+input LiveLikeCommentCreateInput {
+  commentBoardId: UUID!
+  text: NonEmptyString!
+  customData: NonEmptyString
+}
+
+input LiveLikeCommentReplyCreateInput {
+  commentBoardId: UUID!
+  parentCommentId: UUID!
+  text: NonEmptyString!
+  customData: NonEmptyString
+}
+
+input LiveLikeCommentsReportsGetInput {
+  page: PositiveInt
+  clientId: NonEmptyString!
+  commentBoardId: UUID
+  commentId: UUID
+}
+
+input LiveLikeCommentReportCreateInput {
+  commentId: UUID!
+  description: NonEmptyString
+}
+
+enum LiveLikeTokenGateNetworkTypeEnum {
+  ETHEREUM
+  POLYGON
+  CHILIZ
+  HEDERA
+}
+
+enum LiveLikeTokenGateTokenTypeEnum {
+  FUNGIBLE
+  NON_FUNGIBLE
+}
+
+enum LiveLikeChatRoomContentFilterEnum {
+  NONE
+  FILTERED
+  PRODUCER
+}
+
+enum LiveLikeChatRoomVisibilityEnum {
+  EVERYONE
+  MEMBERS
+}
+
+type LiveLikeTokenGateAttribute {
+  trainType: NonEmptyString!
+  value: NonEmptyString!
+}
+
+type LiveLikeTokenGate {
+  contractAddress: NonEmptyString!
+  networkType: LiveLikeTokenGateNetworkTypeEnum!
+  tokenType: LiveLikeTokenGateTokenTypeEnum!
+  attributes: [LiveLikeTokenGateAttribute!]
+}
+
+type LiveLikeChatRoomChannel {
+  chat: NonEmptyString!
+  reactions: NonEmptyString!
+  control: NonEmptyString!
+}
+
+type LiveLikeChatRoom implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  reactionSpaceId: UUID!
+  title: String
+  contentFilter: LiveLikeChatRoomContentFilterEnum!
+  visibility: LiveLikeChatRoomVisibilityEnum!
+  channels: LiveLikeChatRoomChannel!
+  reactionPackIds: [UUID!]
+  sponsorIds: [UUID!]
+  tokenGates: [LiveLikeTokenGate!]
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeChatRoomEdge implements LiveLikeEdge {
+  node: LiveLikeChatRoom!
+  cursor: String
+}
+
+type LiveLikeChatRoomCollection implements LiveLikeConnection {
+  edges: [LiveLikeChatRoomEdge]
+  page: LiveLikePage!
+}
+
+input LiveLikeTokenGateAttributesInput {
+  trainType: NonEmptyString!
+  value: NonEmptyString!
+}
+
+input LiveLikeTokenGateInput {
+  contractAddress: NonEmptyString!
+  networkType: LiveLikeTokenGateNetworkTypeEnum!
+  tokenType: LiveLikeTokenGateTokenTypeEnum!
+  attributes: [LiveLikeTokenGateAttributesInput!]
+}
+
+input LiveLikeChatRoomsGetInput {
+  page: PositiveInt
+  clientId: NonEmptyString!
+}
+
+input LiveLikeChatRoomCreateInput {
+  title: NonEmptyString
+  contentFilter: LiveLikeChatRoomContentFilterEnum
+  visibility: LiveLikeChatRoomVisibilityEnum
+  reactionPackIds: [UUID!]
+  sponsorIds: [UUID!]
+  tokenGates: [LiveLikeTokenGateInput!]
+}
+
+input LiveLikeChatRoomUpdateInput {
+  id: UUID!
+  title: NonEmptyString
+  contentFilter: LiveLikeChatRoomContentFilterEnum
+  visibility: LiveLikeChatRoomVisibilityEnum
+  reactionPackIds: [UUID!]
+  sponsorIds: [UUID!]
+  tokenGates: [LiveLikeTokenGateInput!]
+}
+
+enum LiveLikeRewardActionEnum {
+  ASK_REPLIED
+  POLL_VOTED
+  PREDICTION_CORRECT
+  PREDICTION_MADE
+  QUIZ_ANSWERED
+  QUIZ_CORRECT
+}
+
+"""Represents a reward earned by a user for performing a specific action."""
+type LiveLikeReward {
+  """Unique identifier of the reward item."""
+  rewardItemId: UUID!
+  """The action for which this reward is given."""
+  rewardAction: LiveLikeRewardActionEnum!
+  """The amount or value associated with the reward item."""
+  rewardItemAmount: NonNegativeInt!
+  """The name or label of the reward item."""
+  rewardItemName: NonEmptyString!
+}
+
+type LiveLikeRewardItem implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString
+  name: NonEmptyString!
+  images: [LiveLikeRewardItemImage!]
+  attributes: [LiveLikeKeyValuePair!]
+  rewardItemPoints: NonNegativeInt
+  prizeoutPoints: NonNegativeInt
+  prizeoutConversionRate: NonNegativeInt
+  prizeoutStatus: Boolean
+}
+
+type LiveLikeRewardItemImage implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  imageUrl: URL!
+  name: String
+  mimeType: String
+}
+
+type LiveLikeRewardItemBalance {
+  rewardItemId: UUID!
+  rewardItemName: NonEmptyString!
+  rewardItemBalance: NonNegativeInt!
+  profileId: UUID!
+}
+
+type LiveLikeRewardItemBalanceEdge {
+  node: LiveLikeRewardItemBalance!
+  cursor: String
+}
+
+type LiveLikeRewardItemBalanceCollection {
+  edges: [LiveLikeRewardItemBalanceEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeRewardTable implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  actionChoices: [LiveLikeRewardATableActionChoice!]!
+  entries: [LiveLikeRewardTableEntry!]!
+}
+
+type LiveLikeRewardATableActionChoice {
+  action: String!
+  actionDisplay: NonEmptyString!
+}
+
+type LiveLikeRewardTableEntry @key(fields: "id") {
+  id: UUID!
+  action: NonEmptyString!
+  actionDisplay: NonEmptyString!
+  rewardItemAmount: PositiveInt!
+  rewardItem: LiveLikeRewardItem!
+}
+
+type LiveLikeRewardTableEdge implements LiveLikeEdge {
+  node: LiveLikeRewardTable!
+  cursor: String
+}
+
+type LiveLikeRewardTableCollection implements LiveLikeConnection {
+  edges: [LiveLikeRewardTableEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeRewardItemEdge implements LiveLikeEdge {
+  node: LiveLikeRewardItem!
+  cursor: String
+}
+
+type LiveLikeRewardItemCollection implements LiveLikeConnection {
+  edges: [LiveLikeRewardItemEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeRewardAction implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  programId: UUID!
+  profileId: UUID!
+  profileNickname: NonEmptyString!
+  rewardActionKey: NonEmptyString!
+  rewards: [LiveLikeRewardActionItem!]
+  code: NonEmptyString
+  attributes: [LiveLikeKeyValuePair!]
+  createdAt: NonEmptyString!
+}
+
+type LiveLikeRewardActionItem implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  name: NonEmptyString!
+  amount: NonNegativeInt!
+}
+
+"""
+Represents a transaction made on a RewardItem, such as credits or debits applied to a user's reward item balance.
+"""
+type LiveLikeRewardItemTransaction implements LiveLikeNode @key(fields: "id") {
+  """Unique identifier of the reward item transaction"""
+  id: UUID!
+  """The new balance of the reward item transaction"""
+  newBalance: NonNegativeInt!
+  """The user's prizeout balance of reward item"""
+  prizeoutBalance: NonNegativeInt
+  """The reason of transaction """
+  reason: NonEmptyString!
+  """Optional description for the reward item transaction."""
+  description: NonEmptyString
+  """Optional custom metadata for the reward item transaction."""
+  customData: NonEmptyString
+  """Additional attributes stored as key-value pairs."""
+  attributes: [LiveLikeKeyValuePair!]
+  """UUID of the user that performed this transaction."""
+  transactedById: UUID!
+  """Nickname or label of the user who performed this transaction"""
+  transactedByNickname: NonEmptyString!
+  """Timestamp when the transaction was created, in ISO 8601 format."""
+  createdAt: NonEmptyString!
+}
+
+input LiveLikeRewardBalanceGetInput {
+  rewardItemId: UUID!
+}
+
+input LiveLikeRewardBalancesGetInput {
+  rewardItemIds: [UUID!]!
+}
+
+input LiveLikeRewardTablesGetInput {
+  clientId: NonEmptyString!
+  page: PositiveInt
+}
+
+input LiveLikeRewardTableEntryInput {
+  rewardItemId: UUID!
+  rewardItemAmount: PositiveInt!
+  action: NonEmptyString!
+}
+
+input LiveLikeRewardTableEntryGetInput {
+  id: UUID!
+  entryId: UUID!
+}
+
+input LiveLikeRewardTableEntryCreateInput {
+  rewardTableId: UUID!
+  rewardItemId: UUID!
+  rewardItemAmount: PositiveInt!
+  action: NonEmptyString!
+}
+
+input LiveLikeRewardTableEntryDeleteInput {
+  id: UUID!
+  entryId: UUID!
+}
+
+input LiveLikeRewardItemCreateInput {
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  attributes: [LiveLikeKeyValuePairInput!]
+}
+
+input LiveLikeRewardTableCreateInput {
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  entries: [LiveLikeRewardTableEntryInput!]!
+}
+
+input LiveLikeRewardTableUpdateInput {
+  id: UUID!
+  name: NonEmptyString
+  entries: [LiveLikeRewardTableEntryInput!]
+}
+
+input LiveLikeRewardActionCreateInput {
+  programId: UUID!
+  profileId: UUID!
+  rewardActionKey: NonEmptyString!
+  code: NonEmptyString
+}
+
+input LiveLikeLinkRewardTableWithProgramInput {
+  programId: UUID!
+  rewardTableId: UUID!
+}
+
+input LiveLikeUnlinkRewardTableWithProgramInput {
+  programId: UUID!
+  rewardTableId: UUID!
+}
+
+"""Input type for crediting or debiting a RewardItem."""
+input LiveLikeRewardItemTransactionInput {
+  """ID of the profile associated with the transaction"""
+  profileId: UUID!
+  """ID of the reward item being credited or debited"""
+  rewardItemId: UUID!
+  """Amount to credit or debit. Must be a positive integer."""
+  rewardItemAmount: PositiveInt!
+  """Optional reason for the transaction"""
+  reason: NonEmptyString
+  """Optional description providing the context of the transaction"""
+  description: NonEmptyString
+  """Optional custom metadata related to the transaction, in string format"""
+  customData: NonEmptyString
+  """Optional additional attributes as key-value pairs"""
+  attributes: [LiveLikeKeyValuePairInput!]
+}
+
+type LiveLikeLeaderboard implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  isLocked: Boolean!
+  rewardItemId: UUID!
+  rewardItem: LiveLikeRewardItem
+}
+
+type LiveLikeLeaderboardEdge implements LiveLikeEdge {
+  node: LiveLikeLeaderboard!
+  cursor: String
+}
+
+type LiveLikeLeaderboardCollection implements LiveLikeConnection {
+  edges: [LiveLikeLeaderboardEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeLeaderboardEntry {
+  score: PositiveInt!
+  rank: PositiveInt!
+  percentileRank: NonNegativeFloat!
+  profileId: UUID!
+  profileNickname: NonEmptyString!
+}
+
+type LiveLikeLeaderboardEntryEdge {
+  node: LiveLikeLeaderboardEntry!
+  cursor: String
+}
+
+type LiveLikeLeaderboardEntryCollection {
+  edges: [LiveLikeLeaderboardEntryEdge!]
+  page: LiveLikePageOffset!
+}
+
+type LiveLikeLeaderboardReward {
+  leaderboardId: UUID!
+  leaderboardName: NonEmptyString!
+  rewardItemId: UUID!
+  rewardAction: LiveLikeRewardActionEnum!
+  rewardItemAmount: PositiveInt!
+  rewardItemName: NonEmptyString!
+  newRank: NonNegativeInt!
+  newPercentileRank: NonEmptyString!
+  newScore: NonNegativeFloat!
+}
+
+input LiveLikeLeaderboardsGetInput {
+  clientId: NonEmptyString!
+  programIds: [UUID!]
+  page: PositiveInt
+}
+
+input LiveLikeLeaderboardEntryGetInput {
+  leaderboardId: UUID!
+  profileId: UUID!
+}
+
+input LiveLikeLeaderboardEntriesGetInput {
+  leaderboardId: UUID!
+  page: LiveLikePaginationOffsetInput
+}
+
+input LiveLikeLeaderboardCreateInput {
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  rewardItemId: UUID!
+  isLocked: Boolean
+  attributes: [LiveLikeKeyValuePairInput!]
+}
+
+input LiveLikeLeaderboardUpdateInput {
+  id: UUID!
+  name: NonEmptyString
+  isLocked: Boolean
+  attributes: [LiveLikeKeyValuePairInput!]
+}
+
+input LiveLikeLeaderboardProgramLinkInput {
+  leaderboardId: UUID!
+  programId: UUID!
+}
+
+type LiveLikeBadge implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  mimetype: NonEmptyString!
+  description: NonEmptyString
+  name: NonEmptyString!
+  clientId: NonEmptyString!
+  badgeIconUrl: URL!
+  file: URL!
+  attributes: [LiveLikeKeyValuePair!]
+}
+
+type LiveLikeEarnedBadge @key(fields: "id") {
+  id: UUID!
+  badge: LiveLikeBadge!
+  awardedAt: DateTimeISO!
+}
+
+"""Represents the progress of reward item associated with a badge."""
+type LiveLikeBadgeRewardProgress {
+  """Unique identifier of the reward item."""
+  rewardItemId: UUID!
+  """Name of the reward item."""
+  rewardItemName: NonEmptyString!
+  """Threshold amount required to earn this reward item."""
+  rewardItemThreshold: NonNegativeInt!
+  """Current amount the badge has accumulated toward this reward item."""
+  currentRewardAmount: NonNegativeInt!
+}
+
+"""
+Represents the reward progress tracking for a specific badge, including associated reward items and their progress.
+"""
+type LiveLikeBadgeRewardProgressCollection {
+  """The badge for which the reward progress is being tracked."""
+  badge: LiveLikeBadge!
+  """
+  A list of reward progress entries for each reward item under the badge.
+  """
+  badgeProgress: [LiveLikeBadgeRewardProgress!]
+}
+
+type LiveLikeEarnedBadgeEdge {
+  node: LiveLikeEarnedBadge!
+  cursor: String
+}
+
+type LiveLikeBadgeEdge implements LiveLikeEdge {
+  node: LiveLikeBadge!
+  cursor: String
+}
+
+type LiveLikeBadgeCollection implements LiveLikeConnection {
+  edges: [LiveLikeBadgeEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeEarnedBadgeCollection {
+  edges: [LiveLikeEarnedBadgeEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeBadgeProfile {
+  badgeId: UUID!
+  awardedAt: DateTimeISO!
+  profile: LiveLikeProfile!
+}
+
+type LiveLikeUserBadge implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  badgeId: UUID!
+  awardedAt: DateTimeISO!
+  profile: LiveLikeProfile!
+  badge: LiveLikeBadge!
+}
+
+type LiveLikeBadgeProfileEdge {
+  node: LiveLikeBadgeProfile!
+  cursor: String
+}
+
+type LiveLikeUserBadgeEdge {
+  node: LiveLikeUserBadge!
+  cursor: String
+}
+
+type LiveLikeBadgeProfileCollection {
+  edges: [LiveLikeBadgeProfileEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeUserBadgeCollection {
+  edges: [LiveLikeUserBadgeEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeAwardBadgeInput {
+  badgeId: UUID!
+  profileId: UUID!
+}
+
+type LiveLikeProgramBan implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  programId: UUID!
+  clientId: NonEmptyString!
+  comment: NonEmptyString!
+  bannedProfile: LiveLikeProfile!
+  bannedByProfile: LiveLikeProfile!
+  expiringAt: DateTimeISO
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeCommentBoardBan implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  profileId: UUID!
+  clientId: NonEmptyString!
+  commentBoardId: UUID
+  description: String
+  bannedById: UUID!
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeProgramBanEdge {
+  node: LiveLikeProgramBan!
+  cursor: String
+}
+
+type LiveLikeCommentBoardBanEdge implements LiveLikeEdge {
+  node: LiveLikeCommentBoardBan!
+  cursor: String
+}
+
+type LiveLikeProgramBanCollection {
+  edges: [LiveLikeProgramBanEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeCommentBoardBanCollection implements LiveLikeConnection {
+  edges: [LiveLikeCommentBoardBanEdge!]
+  page: LiveLikePage!
+}
+
+input LiveLikeProgramBanInput {
+  programId: UUID!
+  bannedProfileId: UUID!
+  comment: NonEmptyString!
+  expiringAt: DateTimeISO
+}
+
+input LiveLikeProgramBansInput {
+  programId: UUID
+  bannedProfileId: UUID
+  bannedByProfileId: UUID
+  page: PositiveInt
+}
+
+input LiveLikeCommentBoardBansInput {
+  profileId: UUID
+  commentBoardId: UUID
+  clientId: NonEmptyString
+}
+
+input LiveLikeCommentBoardBanInput {
+  profileId: UUID!
+  commentBoardId: UUID
+  description: String
+}
+
+enum LiveLikeQuestStatusEnum {
+  ACTIVE
+  NOT_STARTED
+  EXPIRED
+}
+
+enum LiveLikeUserQuestStatusEnum {
+  INCOMPLETE
+  CANCELLED
+  COMPLETED
+}
+
+enum LiveLikeUserQuestTaskStatusEnum {
+  INCOMPLETE
+  COMPLETED
+}
+
+enum LiveLikeUserQuestRewardStatus {
+  CLAIMED
+  UNCLAIMED
+}
+
+type LiveLikeQuestTask implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  name: NonEmptyString!
+  questId: UUID!
+  description: String!
+  targetValue: PositiveInt!
+  defaultProgressIncrement: NonNegativeInt!
+  attributes: [LiveLikeKeyValuePair!]
+  createdAt: DateTimeISO!
+}
+
+type LiveLikeQuestReward implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  questId: UUID!
+  rewardItemId: UUID!
+  rewardItemAmount: PositiveInt!
+  rewardItemName: NonEmptyString!
+}
+
+type LiveLikeQuest implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  description: String!
+  status: LiveLikeQuestStatusEnum!
+  questTasks: [LiveLikeQuestTask!]
+  timeout: String
+  questRewards: [LiveLikeQuestReward!]
+  attributes: [LiveLikeKeyValuePair!]
+  createdAt: DateTimeISO!
+  startedAt: DateTimeISO
+  stoppedAt: DateTimeISO
+}
+
+type LiveLikeQuestEdge implements LiveLikeEdge {
+  node: LiveLikeQuest!
+  cursor: String
+}
+
+type LiveLikeQuestCollection implements LiveLikeConnection {
+  edges: [LiveLikeQuestEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeUserQuestTask implements LiveLikeNode {
+  id: UUID!
+  userQuestId: UUID!
+  questTask: LiveLikeQuestTask!
+  status: LiveLikeUserQuestTaskStatusEnum!
+  progress: NonNegativeInt
+  completedAt: DateTimeISO
+  createdAt: NonEmptyString!
+}
+
+type LiveLikeUserQuest implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  profileId: UUID!
+  questId: UUID!
+  status: LiveLikeUserQuestStatusEnum!
+  quest: LiveLikeQuest!
+  userQuestTasks: [LiveLikeUserQuestTask!]
+  rewardsStatus: LiveLikeUserQuestRewardStatus!
+  timerExpired: Boolean
+  activeUntil: DateTimeISO
+  completedAt: NonEmptyString
+  createdAt: NonEmptyString!
+  rewardsClaimedAt: NonEmptyString
+}
+
+type LiveLikeUserQuestEdge implements LiveLikeEdge {
+  node: LiveLikeUserQuest!
+  cursor: String
+}
+
+type LiveLikeUserQuestCollection implements LiveLikeConnection {
+  edges: [LiveLikeUserQuestEdge!]
+  page: LiveLikePage!
+}
+
+type LiveLikeUserQuestTaskProgress @key(fields: "id") {
+  userQuestTaskId: UUID!
+  id: UUID!
+  customIncrement: NonNegativeInt
+  customProgress: NonNegativeInt
+  userQuest: LiveLikeUserQuest!
+}
+
+type LiveLikeUserQuestReward implements LiveLikeNode @key(fields: "id") {
+  id: UUID!
+  userQuestId: UUID!
+  questReward: LiveLikeQuestReward!
+  rewardStatus: LiveLikeUserQuestRewardStatus!
+}
+
+type LiveLikeUserQuestRewardsEdge implements LiveLikeEdge {
+  node: LiveLikeUserQuestReward!
+  cursor: String
+}
+
+type LiveLikeUserQuestRewardsConnection implements LiveLikeConnection {
+  edges: [LiveLikeUserQuestRewardsEdge]
+  page: LiveLikePage!
+}
+
+input LiveLikeQuestInput {
+  clientId: NonEmptyString!
+  name: NonEmptyString!
+  description: String!
+  timeout: String
+  startedAt: DateTimeISO
+  stoppedAt: DateTimeISO
+}
+
+input LiveLikeUserQuestInput {
+  profileId: UUID!
+  questId: UUID!
+}
+
+input LiveLikeUserQuestsInput {
+  clientId: NonEmptyString
+  questId: UUID
+  status: LiveLikeUserQuestStatusEnum
+  rewardsStatus: LiveLikeUserQuestRewardStatus
+}
+
+input LiveLikeUserQuestsTaskProgressInput {
+  userQuestTaskId: UUID!
+  customIncrement: NonNegativeInt
+  customProgress: NonNegativeInt
+}
+
+input LiveLikeUserQuestRewardsInput {
+  userQuestId: UUID!
+  rewardStatus: LiveLikeUserQuestRewardStatus
+}
+
+input LiveLikeclaimUserQuestRewardInput {
+  userQuestId: UUID!
+  rewardsStatus: LiveLikeUserQuestRewardStatus!
+}
+
+scalar _Any
+
+extend type UGCWidget @key(fields: "clientId widgetId type") {
+    clientId: String! @external
+    widgetId: String! @external
+    type: String! @external
+    """ LiveLike resolver for total reactions on type REACTION_SPACE | COMMENT_BOARD"""
+    count: Int
+    """ LiveLike resolver for user reaction on type REACTION_SPACE """
+    liveLikeUserReaction: LiveLikeUserReaction
+}
+
+extend type UGCPost @key(fields: "id") {
+    id: ID! @external
+    """ LiveLike resolver for RichPost """
+    liveLikeRichPost: LiveLikeRichPost
+}
+
+extend type UGCTextPoll @key(fields: "id") {
+    id: ID! @external
+    """ LiveLike resolver for TextPoll """
+    liveLikeTextPoll: LiveLikeTextPoll
+    """ LiveLike resolver for TextPoll userVote """
+    liveLikeUserVote: LiveLikeTextPollVote
+}
+
+extend type UGCImagePoll @key(fields: "id") {
+    id: ID! @external
+    """ LiveLike resolver for ImagePoll """
+    liveLikeImagePoll: LiveLikeImagePoll
+    """ LiveLike resolver for ImagePoll userVote """
+    liveLikeUserVote: LiveLikeImagePollVote
+}
+
+union _Entity = UGCWidget | UGCPost | UGCTextPoll | UGCImagePoll
+
+extend type Query {
+    _entities(representations: [_Any!]!): [_Entity]!
+}

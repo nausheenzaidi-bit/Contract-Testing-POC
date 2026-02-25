@@ -1,0 +1,1097 @@
+{
+  "operations": {
+    "GetGamecastBySlug": {
+      "success": {
+        "data": {
+          "getGamecastBySlug": {
+            "slug": "demo-game-001",
+            "status": "InProgress",
+            "sport": "Football",
+            "gameDate": "2026-02-03",
+            "venue": {
+              "location": "Metro City, MC",
+              "stadium": "Hawks Arena",
+              "weatherEmoji": "☀️",
+              "weatherPrimary": "Clear",
+              "weatherSecondary": "72°F"
+            },
+            "scoreboard": {
+              "gameDate": "2026-02-03",
+              "progress": {
+                "clock": "08:15",
+                "playPeriod": "Q2",
+                "playPeriodCondensed": "2nd",
+                "network": "TNT"
+              },
+              "teamOne": {
+                "name": "Metro Hawks",
+                "shortName": "Hawks",
+                "abbrev": "MHW",
+                "score": "14",
+                "mainScore": "14",
+                "record": "8-3",
+                "logo": "https://mock.example.com/logos/mhw.png",
+                "isWinner": false,
+                "hasPossession": true,
+                "colors": [
+                  "#1a3d6e",
+                  "#ffffff"
+                ]
+              },
+              "teamTwo": {
+                "name": "River Sharks",
+                "shortName": "Sharks",
+                "abbrev": "RSK",
+                "score": "10",
+                "mainScore": "10",
+                "record": "6-5",
+                "logo": "https://mock.example.com/logos/rsk.png",
+                "isWinner": false,
+                "hasPossession": false,
+                "colors": [
+                  "#cc2200",
+                  "#f0f0f0"
+                ]
+              }
+            },
+            "linescore": {
+              "title": "Linescore",
+              "headers": [
+                {
+                  "value": "1"
+                },
+                {
+                  "value": "2"
+                },
+                {
+                  "value": "3"
+                },
+                {
+                  "value": "4"
+                }
+              ],
+              "summaryHeaders": [
+                {
+                  "value": "T"
+                }
+              ],
+              "teamOne": {
+                "name": "Metro Hawks",
+                "logo": "https://mock.example.com/logos/mhw.png",
+                "record": "8-3",
+                "values": [
+                  {
+                    "value": "7"
+                  },
+                  {
+                    "value": "7"
+                  },
+                  {
+                    "value": "-"
+                  },
+                  {
+                    "value": "-"
+                  }
+                ],
+                "summaryValues": [
+                  {
+                    "value": "14"
+                  }
+                ]
+              },
+              "teamTwo": {
+                "name": "River Sharks",
+                "logo": "https://mock.example.com/logos/rsk.png",
+                "record": "6-5",
+                "values": [
+                  {
+                    "value": "3"
+                  },
+                  {
+                    "value": "7"
+                  },
+                  {
+                    "value": "-"
+                  },
+                  {
+                    "value": "-"
+                  }
+                ],
+                "summaryValues": [
+                  {
+                    "value": "10"
+                  }
+                ]
+              }
+            },
+            "pbp": {
+              "tabs": {
+                "scoringSummary": {
+                  "description": "Scoring Summary",
+                  "id": "scoring",
+                  "groupings": [
+                    {
+                      "description": "1st Quarter",
+                      "collapsed": false,
+                      "collapsable": true,
+                      "plays": [
+                        1,
+                        2
+                      ]
+                    },
+                    {
+                      "description": "2nd Quarter",
+                      "collapsed": false,
+                      "collapsable": true,
+                      "plays": [
+                        3,
+                        4
+                      ]
+                    }
+                  ]
+                },
+                "byPeriod": {
+                  "description": "By Period",
+                  "id": "period",
+                  "groupings": [
+                    {
+                      "description": "1st Quarter",
+                      "collapsed": true,
+                      "collapsable": true,
+                      "plays": [
+                        1,
+                        2
+                      ]
+                    }
+                  ]
+                },
+                "penalties": null
+              },
+              "scoringSummary": {
+                "description": "Scoring Summary",
+                "id": "scoring",
+                "groupings": [
+                  {
+                    "description": "1st Quarter",
+                    "plays": [
+                      1,
+                      2
+                    ]
+                  },
+                  {
+                    "description": "2nd Quarter",
+                    "plays": [
+                      3,
+                      4
+                    ]
+                  }
+                ]
+              },
+              "plays": [
+                {
+                  "sequence": 1,
+                  "summary": "Field goal from 42 yards.",
+                  "gameProgress": "11:22 Q1",
+                  "gameProgressPrimary": "11:22",
+                  "gameProgressSecondary": "Q1",
+                  "scoreTeamOne": 0,
+                  "scoreTeamTwo": 3,
+                  "teamName": "River Sharks",
+                  "logo": "https://mock.example.com/logos/rsk.png",
+                  "playStoppage": false,
+                  "teamOneScoringPlay": false,
+                  "teamTwoScoringPlay": true
+                },
+                {
+                  "sequence": 2,
+                  "summary": "Rushing touchdown, 8 yard run.",
+                  "gameProgress": "05:48 Q1",
+                  "gameProgressPrimary": "05:48",
+                  "gameProgressSecondary": "Q1",
+                  "scoreTeamOne": 7,
+                  "scoreTeamTwo": 3,
+                  "teamName": "Metro Hawks",
+                  "logo": "https://mock.example.com/logos/mhw.png",
+                  "playStoppage": false,
+                  "teamOneScoringPlay": true,
+                  "teamTwoScoringPlay": false
+                },
+                {
+                  "sequence": 3,
+                  "summary": "Passing touchdown, 23 yard strike to WR.",
+                  "gameProgress": "12:05 Q2",
+                  "gameProgressPrimary": "12:05",
+                  "gameProgressSecondary": "Q2",
+                  "scoreTeamOne": 14,
+                  "scoreTeamTwo": 3,
+                  "teamName": "Metro Hawks",
+                  "logo": "https://mock.example.com/logos/mhw.png",
+                  "playStoppage": false,
+                  "teamOneScoringPlay": true,
+                  "teamTwoScoringPlay": false
+                },
+                {
+                  "sequence": 4,
+                  "summary": "Receiving touchdown, 65 yard catch-and-run.",
+                  "gameProgress": "08:15 Q2",
+                  "gameProgressPrimary": "08:15",
+                  "gameProgressSecondary": "Q2",
+                  "scoreTeamOne": 14,
+                  "scoreTeamTwo": 10,
+                  "teamName": "River Sharks",
+                  "logo": "https://mock.example.com/logos/rsk.png",
+                  "playStoppage": false,
+                  "teamOneScoringPlay": false,
+                  "teamTwoScoringPlay": true
+                }
+              ]
+            }
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getGamecastBySlug": {
+            "slug": "demo-game-001",
+            "status": "Scheduled",
+            "sport": "Football",
+            "gameDate": "2026-02-10",
+            "venue": {
+              "location": "Metro City, MC",
+              "stadium": "Hawks Arena"
+            },
+            "scoreboard": null,
+            "linescore": null,
+            "pbp": {
+              "scoringSummary": null,
+              "plays": []
+            }
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Upstream stats provider timeout (mocked)"
+          }
+        ]
+      },
+      "ai-not-found": {
+        "data": {
+          "getGamecastBySlug": null
+        },
+        "errors": [
+          {
+            "message": "not found"
+          }
+        ]
+      }
+    },
+    "GetScores": {
+      "success": {
+        "data": {
+          "getScores": {
+            "leagues": [
+              {
+                "id": "nfl",
+                "name": "NFL",
+                "slug": "nfl",
+                "current": true
+              },
+              {
+                "id": "nba",
+                "name": "NBA",
+                "slug": "nba",
+                "current": false
+              },
+              {
+                "id": "nhl",
+                "name": "NHL",
+                "slug": "nhl",
+                "current": false
+              }
+            ],
+            "calendarNavigation": {
+              "previous": [
+                {
+                  "name": "Feb 2",
+                  "href": "/scores?date=2026-02-02"
+                }
+              ],
+              "current": [
+                {
+                  "name": "Feb 3",
+                  "href": "/scores?date=2026-02-03"
+                }
+              ],
+              "next": [
+                {
+                  "name": "Feb 4",
+                  "href": "/scores?date=2026-02-04"
+                }
+              ]
+            },
+            "gameGroups": [
+              {
+                "name": "Week 5",
+                "current": true,
+                "games": [
+                  {
+                    "id": "game-1001",
+                    "name": "Metro Hawks at River Sharks",
+                    "gameDate": "2026-02-03T20:00:00Z",
+                    "sport": "Football",
+                    "league": "NFL",
+                    "status": "InProgress",
+                    "teamOne": {
+                      "name": "Metro Hawks",
+                      "abbrev": "MHW",
+                      "mainScore": "14",
+                      "score": "14",
+                      "record": "8-3",
+                      "logo": "https://mock.example.com/logos/mhw.png",
+                      "isWinner": false,
+                      "hasPossession": true,
+                      "colors": [
+                        "#1a3d6e"
+                      ]
+                    },
+                    "teamTwo": {
+                      "name": "River Sharks",
+                      "abbrev": "RSK",
+                      "mainScore": "10",
+                      "score": "10",
+                      "record": "6-5",
+                      "logo": "https://mock.example.com/logos/rsk.png",
+                      "isWinner": false,
+                      "hasPossession": false,
+                      "colors": [
+                        "#cc2200"
+                      ]
+                    },
+                    "progress": {
+                      "clock": "08:15",
+                      "playPeriod": "Q2",
+                      "network": "TNT"
+                    }
+                  },
+                  {
+                    "id": "game-1002",
+                    "name": "Summit Bears vs Canyon Wolves",
+                    "gameDate": "2026-02-03T17:00:00Z",
+                    "sport": "Football",
+                    "league": "NFL",
+                    "status": "Complete",
+                    "teamOne": {
+                      "name": "Summit Bears",
+                      "abbrev": "SMB",
+                      "mainScore": "24",
+                      "score": "24",
+                      "record": "9-2",
+                      "logo": "https://mock.example.com/logos/smb.png",
+                      "isWinner": true,
+                      "colors": [
+                        "#2d5a27"
+                      ]
+                    },
+                    "teamTwo": {
+                      "name": "Canyon Wolves",
+                      "abbrev": "CWV",
+                      "mainScore": "17",
+                      "score": "17",
+                      "record": "5-6",
+                      "logo": "https://mock.example.com/logos/cwv.png",
+                      "isWinner": false,
+                      "colors": [
+                        "#7a5c3a"
+                      ]
+                    },
+                    "progress": {
+                      "playPeriod": "Final"
+                    }
+                  },
+                  {
+                    "id": "game-1003",
+                    "name": "Coast Eagles at Lake Storm",
+                    "gameDate": "2026-02-03T23:30:00Z",
+                    "sport": "Football",
+                    "league": "NFL",
+                    "status": "Scheduled",
+                    "teamOne": {
+                      "name": "Coast Eagles",
+                      "abbrev": "CEG",
+                      "mainScore": "0",
+                      "record": "7-4",
+                      "logo": "https://mock.example.com/logos/ceg.png",
+                      "colors": [
+                        "#003366"
+                      ]
+                    },
+                    "teamTwo": {
+                      "name": "Lake Storm",
+                      "abbrev": "LST",
+                      "mainScore": "0",
+                      "record": "4-7",
+                      "logo": "https://mock.example.com/logos/lst.png",
+                      "colors": [
+                        "#5e17eb"
+                      ]
+                    },
+                    "progress": {
+                      "playPeriod": "8:30 PM ET",
+                      "network": "ESPN"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getScores": {
+            "leagues": [
+              {
+                "id": "nfl",
+                "name": "NFL",
+                "slug": "nfl",
+                "current": true
+              }
+            ],
+            "gameGroups": []
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Stats service unavailable (mocked)"
+          }
+        ]
+      }
+    },
+    "GetSchedule": {
+      "success": {
+        "data": {
+          "getSchedule": {
+            "slug": "metro-hawks",
+            "name": "Metro Hawks",
+            "league": "NFL",
+            "scheduleGroupings": [
+              {
+                "title": "Regular Season",
+                "current": true,
+                "entries": [
+                  {
+                    "date": "2026-01-12",
+                    "opponent": "Summit Bears",
+                    "opponentLogo": "https://mock.example.com/logos/smb.png",
+                    "homeAway": "home",
+                    "startTimeTbd": false,
+                    "status": "Complete",
+                    "resultDescription": "W 28-17",
+                    "resultCode": {
+                      "value": "W",
+                      "color": "#2d7d32"
+                    }
+                  },
+                  {
+                    "date": "2026-01-19",
+                    "opponent": "Canyon Wolves",
+                    "opponentLogo": "https://mock.example.com/logos/cwv.png",
+                    "homeAway": "away",
+                    "startTimeTbd": false,
+                    "status": "Complete",
+                    "resultDescription": "L 14-21",
+                    "resultCode": {
+                      "value": "L",
+                      "color": "#c62828"
+                    }
+                  },
+                  {
+                    "date": "2026-02-03",
+                    "opponent": "River Sharks",
+                    "opponentLogo": "https://mock.example.com/logos/rsk.png",
+                    "homeAway": "away",
+                    "startTimeTbd": false,
+                    "status": "InProgress",
+                    "resultDescription": "In Progress"
+                  },
+                  {
+                    "date": "2026-02-10",
+                    "opponent": "Coast Eagles",
+                    "opponentLogo": "https://mock.example.com/logos/ceg.png",
+                    "homeAway": "home",
+                    "startTimeTbd": false,
+                    "status": "Scheduled",
+                    "resultDescription": "4:00 PM ET"
+                  },
+                  {
+                    "date": "2026-02-17",
+                    "opponent": "Lake Storm",
+                    "opponentLogo": "https://mock.example.com/logos/lst.png",
+                    "homeAway": "home",
+                    "startTimeTbd": true,
+                    "status": "Scheduled",
+                    "resultDescription": "TBD"
+                  }
+                ],
+                "key": [
+                  {
+                    "value": "W",
+                    "color": "#2d7d32"
+                  },
+                  {
+                    "value": "L",
+                    "color": "#c62828"
+                  }
+                ]
+              },
+              {
+                "title": "Postseason",
+                "current": false,
+                "entries": []
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getSchedule": {
+            "slug": "metro-hawks",
+            "name": "Metro Hawks",
+            "league": "NFL",
+            "scheduleGroupings": []
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Schedule service timeout (mocked)"
+          }
+        ]
+      }
+    },
+    "GetStandings": {
+      "success": {
+        "data": {
+          "getStandings": {
+            "slug": "nfl",
+            "name": "NFL Standings",
+            "season": 2026,
+            "standingGroupings": [
+              {
+                "title": "AFC",
+                "entries": [
+                  {
+                    "title": "AFC East",
+                    "current": true,
+                    "headers": [
+                      {
+                        "title": "Team"
+                      },
+                      {
+                        "title": "W"
+                      },
+                      {
+                        "title": "L"
+                      },
+                      {
+                        "title": "PCT"
+                      },
+                      {
+                        "title": "PF"
+                      },
+                      {
+                        "title": "PA"
+                      }
+                    ],
+                    "teams": [
+                      {
+                        "name": "Metro Hawks",
+                        "logo": "https://mock.example.com/logos/mhw.png",
+                        "number": "1",
+                        "current": true,
+                        "slug": "metro-hawks",
+                        "color": "#1a3d6e",
+                        "values": [
+                          {
+                            "value": "8"
+                          },
+                          {
+                            "value": "3"
+                          },
+                          {
+                            "value": ".727"
+                          },
+                          {
+                            "value": "285"
+                          },
+                          {
+                            "value": "198"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Coast Eagles",
+                        "logo": "https://mock.example.com/logos/ceg.png",
+                        "number": "2",
+                        "current": false,
+                        "slug": "coast-eagles",
+                        "values": [
+                          {
+                            "value": "7"
+                          },
+                          {
+                            "value": "4"
+                          },
+                          {
+                            "value": ".636"
+                          },
+                          {
+                            "value": "251"
+                          },
+                          {
+                            "value": "220"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "River Sharks",
+                        "logo": "https://mock.example.com/logos/rsk.png",
+                        "number": "3",
+                        "current": false,
+                        "slug": "river-sharks",
+                        "values": [
+                          {
+                            "value": "6"
+                          },
+                          {
+                            "value": "5"
+                          },
+                          {
+                            "value": ".545"
+                          },
+                          {
+                            "value": "230"
+                          },
+                          {
+                            "value": "225"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Lake Storm",
+                        "logo": "https://mock.example.com/logos/lst.png",
+                        "number": "4",
+                        "current": false,
+                        "slug": "lake-storm",
+                        "values": [
+                          {
+                            "value": "4"
+                          },
+                          {
+                            "value": "7"
+                          },
+                          {
+                            "value": ".364"
+                          },
+                          {
+                            "value": "195"
+                          },
+                          {
+                            "value": "260"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "NFC",
+                "entries": [
+                  {
+                    "title": "NFC West",
+                    "current": false,
+                    "headers": [
+                      {
+                        "title": "Team"
+                      },
+                      {
+                        "title": "W"
+                      },
+                      {
+                        "title": "L"
+                      },
+                      {
+                        "title": "PCT"
+                      },
+                      {
+                        "title": "PF"
+                      },
+                      {
+                        "title": "PA"
+                      }
+                    ],
+                    "teams": [
+                      {
+                        "name": "Summit Bears",
+                        "logo": "https://mock.example.com/logos/smb.png",
+                        "number": "1",
+                        "current": false,
+                        "slug": "summit-bears",
+                        "color": "#2d5a27",
+                        "values": [
+                          {
+                            "value": "9"
+                          },
+                          {
+                            "value": "2"
+                          },
+                          {
+                            "value": ".818"
+                          },
+                          {
+                            "value": "310"
+                          },
+                          {
+                            "value": "180"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Canyon Wolves",
+                        "logo": "https://mock.example.com/logos/cwv.png",
+                        "number": "2",
+                        "current": false,
+                        "slug": "canyon-wolves",
+                        "values": [
+                          {
+                            "value": "5"
+                          },
+                          {
+                            "value": "6"
+                          },
+                          {
+                            "value": ".455"
+                          },
+                          {
+                            "value": "210"
+                          },
+                          {
+                            "value": "240"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getStandings": {
+            "slug": "nfl",
+            "name": "NFL Standings",
+            "season": 2026,
+            "standingGroupings": []
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Standings service unavailable (mocked)"
+          }
+        ]
+      }
+    },
+    "GetUser": {
+      "success": {
+        "data": {
+          "getUser": {
+            "id": "mock-user-001",
+            "profileId": "mock-profile-001",
+            "type": "registered",
+            "name": {
+              "first": "Demo",
+              "last": "User",
+              "full": "Demo User"
+            },
+            "avatar": {
+              "url": "https://mock.example.com/avatars/default.png"
+            },
+            "settings": {
+              "spoilers_enabled": "false",
+              "alerts": [
+                {
+                  "type": "scores",
+                  "enabled": true
+                },
+                {
+                  "type": "news",
+                  "enabled": true
+                },
+                {
+                  "type": "highlights",
+                  "enabled": false
+                }
+              ],
+              "social": [
+                {
+                  "type": "likes",
+                  "enabled": true
+                },
+                {
+                  "type": "comments",
+                  "enabled": true
+                }
+              ]
+            },
+            "favoriteTeams": [
+              {
+                "name": "Metro Hawks",
+                "slug": "metro-hawks"
+              },
+              {
+                "name": "Summit Bears",
+                "slug": "summit-bears"
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getUser": null
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "User service timeout (mocked)"
+          }
+        ]
+      }
+    },
+    "SetGlobalAlerts": {
+      "success": {
+        "data": {
+          "setGlobalAlerts": {
+            "spoilers_enabled": "false",
+            "alerts": [
+              {
+                "type": "scores",
+                "enabled": true
+              },
+              {
+                "type": "news",
+                "enabled": true
+              },
+              {
+                "type": "highlights",
+                "enabled": false
+              }
+            ],
+            "social": [
+              {
+                "type": "likes",
+                "enabled": true
+              },
+              {
+                "type": "comments",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      },
+      "validation_error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Invalid alert type provided (mocked)"
+          }
+        ]
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Failed to update alerts (mocked)"
+          }
+        ]
+      }
+    },
+    "GetChannelBySlug": {
+      "success": {
+        "data": {
+          "getChannelBySlug": {
+            "uuid": "channel-uuid-001",
+            "cmsId": "cms-channel-001",
+            "title": "Metro Hawks",
+            "headline": "Your home for all things Metro Hawks",
+            "type": "team",
+            "isPublished": true,
+            "language": "en",
+            "tag": {
+              "name": "Metro Hawks",
+              "slug": "metro-hawks",
+              "permalink": "/team/metro-hawks"
+            },
+            "components": [
+              {
+                "userAlerts": [
+                  {
+                    "id": "alert-001",
+                    "title": "Game Day",
+                    "text": "Metro Hawks vs River Sharks kicks off at 8:00 PM ET",
+                    "createdAt": "2026-02-03T15:00:00Z",
+                    "showAlertCard": true,
+                    "attachments": [
+                      {
+                        "mediaType": "image",
+                        "mediaUrl": "https://mock.example.com/alerts/gameday.jpg",
+                        "width": 800,
+                        "height": 450
+                      }
+                    ]
+                  }
+                ],
+                "userSocialAlerts": [
+                  {
+                    "id": "social-alert-001",
+                    "title": "Trending",
+                    "text": "Hawks QB throws for 300+ yards in first half",
+                    "createdAt": "2026-02-03T20:30:00Z",
+                    "showAlertCard": true,
+                    "attachments": []
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getChannelBySlug": {
+            "uuid": "channel-uuid-002",
+            "cmsId": "cms-channel-002",
+            "title": "Unknown Team",
+            "components": []
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Channel not found (mocked)"
+          }
+        ]
+      }
+    },
+    "GetSocialAlerts": {
+      "success": {
+        "data": {
+          "getChannelBySlug": {
+            "uuid": "channel-uuid-001",
+            "components": [
+              {
+                "userSocialAlerts": [
+                  {
+                    "id": "social-001",
+                    "text": "Hawks QB with an incredible play!",
+                    "title": "Highlight",
+                    "adParameters": null,
+                    "createdAt": "2026-02-03T20:45:00Z",
+                    "showAlertCard": true,
+                    "attachments": [
+                      {
+                        "mediaType": "video",
+                        "mediaUrl": "https://mock.example.com/videos/highlight-001.mp4",
+                        "height": 720,
+                        "width": 1280
+                      }
+                    ],
+                    "userDestination": {
+                      "contentModule": {
+                        "contentID": "content-001",
+                        "type": "VIDEO",
+                        "id": "module-001",
+                        "commentsEnabled": true,
+                        "socialWidgets": {
+                          "clientId": "widget-001"
+                        }
+                      },
+                      "tag": {
+                        "_id": "tag-001"
+                      }
+                    }
+                  }
+                ],
+                "userAlerts": [
+                  {
+                    "id": "alert-001",
+                    "text": "Metro Hawks score a touchdown!",
+                    "title": "Score Update",
+                    "adParameters": null,
+                    "createdAt": "2026-02-03T20:30:00Z",
+                    "showAlertCard": true,
+                    "attachments": [],
+                    "userDestination": {
+                      "contentModule": {
+                        "contentID": "content-002",
+                        "type": "GAMECAST",
+                        "id": "module-002",
+                        "commentsEnabled": false,
+                        "socialWidgets": null
+                      },
+                      "tag": {
+                        "_id": "tag-002"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "empty": {
+        "data": {
+          "getChannelBySlug": {
+            "uuid": "channel-uuid-001",
+            "components": [
+              {
+                "userSocialAlerts": [],
+                "userAlerts": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "__httpStatus": 200,
+        "errors": [
+          {
+            "message": "Social alerts unavailable (mocked)"
+          }
+        ]
+      }
+    }
+  }
+}

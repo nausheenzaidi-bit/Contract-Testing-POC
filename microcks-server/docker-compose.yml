@@ -1,0 +1,54 @@
+# Full Microcks stack with Keycloak authentication
+# Usage: docker compose up -d
+# UI: http://localhost:8080  (admin / microcks123)
+
+services:
+  mongo:
+    image: mongo:4.4
+    container_name: microcks-db
+    volumes:
+      - microcks-mongo-data:/data/db
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0
+    container_name: microcks-sso
+    ports:
+      - "18080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./config/keycloak-realm.json:/opt/keycloak/data/import/microcks-realm.json
+
+  postman:
+    image: quay.io/microcks/microcks-postman-runtime:latest
+    container_name: microcks-postman-runtime
+
+  app:
+    image: quay.io/microcks/microcks:latest
+    container_name: microcks
+    depends_on:
+      - mongo
+      - keycloak
+      - postman
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017
+      SPRING_DATA_MONGODB_DATABASE: microcks
+      POSTMAN_RUNNER_URL: http://postman:3000
+      TEST_CALLBACK_URL: http://microcks:8080
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_PUBLIC_URL: http://localhost:18080
+    volumes:
+      - ./config/application.properties:/deployments/config/application.properties
+
+volumes:
+  microcks-mongo-data:

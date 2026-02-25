@@ -1,0 +1,1035 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@shareable", "@requires", "@external", "@inaccessible", "@provides"])
+{
+  query: Query
+}
+
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @extends on OBJECT
+
+type Article
+  @key(fields: "uuid")
+{
+  uuid: String!
+  betTags: [TagV2] @external
+  statsBetOffers(timezone: Int): StatsBetOffer @requires(fields: "betTags { slug }")
+}
+
+type ChannelComponent
+  @key(fields: "uuid")
+{
+  uuid: String!
+  tagUUID: String @external
+  tagSlug: String @external
+  tagType: String @external
+  semanticID: SemanticID @external
+  semanticType: SemanticType @external
+  statsGamecast: StatsGamecast @requires(fields: "tagSlug semanticID semanticType")
+  statsStandings(season: Int, filter: String): StatsStanding @requires(fields: "tagUUID semanticID semanticType")
+  statsSchedule(season: Int, timezone: Int): StatsSchedule @requires(fields: "tagSlug semanticID semanticType")
+  statsScores(league: String, context: String, date: String, timezone: Int, locale: String): Scores @requires(fields: "semanticID semanticType tagSlug tagType userTags(tenant:bleacherReport) { slug }")
+  userTags(tenant: Tenant!): [TagV2] @external
+}
+
+type Clock
+  @cacheControl(maxAge: 240)
+{
+  hours: String
+  milliseconds: String
+  minutes: String
+  seconds: String
+  stoppage: String
+}
+
+scalar Date
+
+enum StatsLeagues {
+  MLB
+  Soccer
+  NHL
+  NCAAF
+  NCAABB
+  NFL
+  NBA
+  WNBA
+  OlympicBasketball
+  GLeague
+  Other
+  Olympics
+  Unknown
+  Golf
+  Tennis
+  Formula1
+  NCAABBW
+  NASCAR
+  Unrivaled
+}
+
+enum SortDirections {
+  asc
+  desc
+}
+
+enum Territories {
+  USA
+}
+
+enum SortOrder {
+  Ascending
+  Descending
+}
+
+enum StatsSport {
+  Football
+  Basketball
+  Baseball
+  Hockey
+  Soccer
+  Other
+  Golf
+  Tennis
+  Motorsports
+}
+
+enum StateStatus {
+  Scheduled
+  InProgress
+  Complete
+}
+
+enum Status {
+  Scheduled
+  Postponed
+  Unnecessary
+  Suspended
+  WDelay
+  FDelay
+  ODelay
+  Created
+  Cancelled
+  InProgress
+  Reopened
+  Complete
+  Closed
+  TimeTBD
+  Maintenance
+  IfNecessary
+  FlexSchedule
+  Halftime
+  Delayed
+  Interrupted
+  Abandoned
+}
+
+enum ScoresOddsSportsbook {
+  Caesars
+  Consensus
+  SportRadar
+  DraftKings
+  FanDuel
+  None
+  Unknown
+}
+
+enum VisibilityReason {
+  HAS_DATA
+  NO_DATA
+  INSIDE_TIME_WINDOW
+  OUTSIDE_TIME_WINDOW
+}
+
+type Game
+  @key(fields: "sportradar_id")
+  @cacheControl(maxAge: 240)
+{
+  away: Team
+  gameDate: GameDate
+  gameProgress: GameProgress
+  home: Team
+  id: String
+  name: String
+  score: Score
+  sourceGameId: String
+  sport: SportMetaData
+  sportradar_id: String
+  stateStatus: StateStatus
+  status: String
+  weekId: String
+}
+
+type GameDate
+  @cacheControl(maxAge: 240)
+{
+  epoch: Int
+  iso8501: String
+}
+
+type GameProgress
+  @cacheControl(maxAge: 240)
+{
+  clock: Clock
+  currentPeriod: String
+  displayPrimary: String
+  displaySecondary: String
+  totalPeriods: String
+}
+
+type GroupingHeader
+  @key(fields: "id slug gameStartTime gameEndTime")
+{
+  id: String @external
+  slug: String @external
+  gameStartTime: Date @external
+  gameEndTime: Date @external
+  visible: Boolean!
+  visibleReason: VisibilityReason
+}
+
+"""
+The `ID` scalar type represents a unique MongoDB identifier in collection.
+MongoDB by default use 12-byte ObjectId value
+(https://docs.mongodb.com/manual/reference/bson-types/#objectid). But MongoDB
+also may accepts string or integer as correct values for _id field.
+"""
+scalar MongoID
+
+type Page
+  @key(fields: "_id")
+  @cacheControl(maxAge: 240)
+{
+  _id: MongoID!
+}
+
+type Query
+  @cacheControl(maxAge: 240)
+{
+  """getGamesByGameDate | Stat API | Statmilk API"""
+  getGamesByGameDate(startDate: String!, endDate: String!, timezone: Int!, sortOrder: SortOrder, status: [Status], stateStatus: [StateStatus], leagues: [StatsLeagues]): [Game]
+
+  """getGamesByGameIds | Stat API | Statmilk API"""
+  getGamesByGameIds(gameIds: [String]!): [Game]
+
+  """getGamesBySportRadarIds | Stat API | Statmilk API"""
+  getGamesBySportRadarIds(gameIds: [String]!): [Game]
+
+  """getScores | Stat API | Statmilk API"""
+  getScores(timezone: Int!, date: String, league: StatsLeagues, context: String, locale: String, tags: [Int], slugs: [String]): Scores
+
+  """getStandings | Stats API | Statmilk API"""
+  getStandings(permalink: String!, season: Int): StatsStanding
+
+  """getGameCastBySlug | Stats API | Statmilk API"""
+  getGamecastBySlug(slug: String!): StatsGamecast
+
+  """getSchedule | Stats API | Statmilk API"""
+  getSchedule(slug: String!, timezone: Int, season: Int): StatsSchedule
+
+  """getGameCastByTagUUID | Stats API | Statmilk API"""
+  getGameCastByTagUUID(uuid: String!): StatsGamecast
+}
+
+type Score
+  @cacheControl(maxAge: 240)
+{
+  away: Int
+  home: Int
+}
+
+type Scores
+  @key(fields: "hash")
+  @cacheControl(maxAge: 15)
+{
+  calendarNavigation: ScoresCalendarNavigation
+  leagues: [ScoresLeague]
+  gameGroups: [GameGroup]
+  bettingLink: ScoresBettingLink
+  hash: String @inaccessible
+}
+
+type Season
+  @cacheControl(maxAge: 240)
+{
+  id: String
+  current: Int
+  end: String
+  name: String
+  start: String
+  type: String
+}
+
+type SportMetaData
+  @cacheControl(maxAge: 240)
+{
+  league: StatsLeagues
+  sport: StatsSport
+}
+
+type StatsLinescore {
+  gameState: StatsLinescoreGameState
+  headers: [StatsLinescoreValue]
+  summaryHeaders: [StatsLinescoreValue]
+  teamOne: StatsLinescoreTeam
+  teamTwo: StatsLinescoreTeam
+  title: String
+}
+
+type StatsLinescoreBatter {
+  atBats: Int
+  average: Float
+  player: String
+  totalHits: Int
+}
+
+type StatsLinescoreDiamond {
+  first: Boolean
+  second: Boolean
+  third: Boolean
+}
+
+type StatsLinescoreGameState {
+  balls: Int
+  batter: StatsLinescoreBatter
+  outs: Int
+  pitcher: StatsLinescorePitcher
+  runners: StatsLinescoreDiamond
+  strikes: Int
+}
+
+type StatsLinescorePitcher {
+  player: String
+  totalPitches: Int
+  totalStrikeouts: Int
+}
+
+type StatsLinescoreTeam {
+  colors: [String]
+  logo: String
+  name: String
+  record: String
+  summaryValues: [StatsLinescoreValue]
+  values: [StatsLinescoreValue]
+}
+
+type StatsLinescoreValue {
+  value: String
+}
+
+type StatsPodium {
+  entries: [StatsPodiumEntry]
+  title: String
+}
+
+type StatsPodiumEntry {
+  logo: String
+  name: String
+  place: String
+  result: String
+  subResult: String
+}
+
+type StatsRaceInfo {
+  distance: String
+  distanceUnit: String
+  laps: String
+  name: String
+  status: StatsGameStatus
+  type: String
+}
+
+type StatsSchedule
+  @key(fields: "slug")
+{
+  adPlacement: [StatsScheduleAdPlacement]
+  league: String
+  name: String
+  slug: String!
+  scheduleGroupings: [StatsScheduleGrouping]
+}
+
+type StatsScheduleAdPlacement {
+  adId: String
+  gameRowIndex: Int
+  groupIndex: Int
+  repeatOffset: Int
+}
+
+type StatsScheduleGrouping {
+  current: Boolean
+  title: String
+  entries: [StatsScheduleEntry]
+  key: [StatsScheduleKey]
+  link: StatsScheduleLink
+}
+
+type StatsScheduleEntry {
+  group: String
+  current: Boolean
+  date: String
+  slug: String
+  homeAway: String
+  isoUtcDatetime: String
+  opponent: String
+  opponentLogo: String
+  resultDescription: String
+  startTimeTbd: Boolean
+  status: StatsGameStatus
+  location: ScoresMetadataLocation
+  resultCode: StatsScheduleResultCode
+  ticketInfo: StatsScheduleTickets
+}
+
+enum StatsGameStatus {
+  Scheduled
+  InProgress
+  Complete
+  Unknow
+  Closed
+}
+
+type StatsScheduleResultCode {
+  color: String
+  colorNight: String
+  value: String
+}
+
+type StatsScheduleTickets {
+  url: String
+  minPrice: String
+}
+
+type StatsScheduleKey {
+  value: String
+  color: String
+  returnColor: Boolean
+}
+
+type StatsScheduleLink {
+  title: String
+  type: String
+  value: String
+}
+
+type StatsScoreboard {
+  gameDate: String
+  progress: ScoresProgress
+  teamOne: ScoresGameTeam
+  teamTwo: ScoresGameTeam
+}
+
+type StatsScoreboardTeam {
+  abbrev: String
+  bonus: Boolean
+  colors: [String]
+  competitors: [ScoresTeamCompetitor]
+  doubleBonus: Boolean
+  hasPossession: Boolean
+  hasPowerPlay: Boolean
+  isRedZone: Boolean
+  isWinner: Boolean
+  logo: String
+  name: String
+  odds: String
+  periodScores: [PeriodScore]
+  permalink: String
+  rank: Int
+  record: String
+  score: String
+  shortName: String
+  timeoutsRemaining: Int
+  totalTimeouts: Int
+
+  """
+  when true, the competitors are undecided, and the competitors array represents potential competitors for this team
+  """
+  virtual: Boolean
+}
+
+type StatsVenue {
+  location: String
+  stadium: String
+  weatherEmoji: String
+  weatherPrimary: String
+  weatherSecondary: String
+}
+
+type Tag
+  @key(fields: "permalink", resolvable: false)
+{
+  permalink: String!
+}
+
+type Team
+  @cacheControl(maxAge: 240)
+{
+  abbreviation: String
+  draws: String
+  logo: String
+  losses: String
+  market: String
+  mascot: String
+  name: String
+  wins: String
+}
+
+type Venue
+  @key(fields: "id")
+  @cacheControl(maxAge: 240)
+{
+  id: ID
+}
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+"""
+The StatsBetting is an Entity so it can be extended in other subgraphs.
+"""
+type StatsBetting
+  @key(fields: "id")
+{
+  id: ID!
+  jsonResponse: String
+}
+
+type StatsBetOffer {
+  jsonResponse: String
+}
+
+"""
+The jsonResponse field will soon be deprecated. Use new GraphQL types IF they exist.
+jsonResponse is being split into native types. Currently GraphQL types exist for Gamecast Content Modules / Scoreboards, not yet the full Gamecast experience.
+New types exist for the following StatMilk payloads: **scoreLeaderboard**, **gameDate**, **linescore**, **podium**, **raceInfo**, **scoreboard**, **sport**, **status**, **venue**
+"""
+type StatsGamecast
+  @key(fields: "slug")
+  @cacheControl(maxAge: 10)
+{
+  tag(tenant: Tenant): TagV2
+  slug: String!
+  scoreLeaderboard: ScoresEvent
+  gameDate: String
+  linescore: StatsLinescore
+  podium: StatsPodium
+  raceInfo: StatsRaceInfo
+  scoreboard: StatsScoreboard
+  sport: StatsSport
+  status: StatsGameStatus
+  venue: StatsVenue
+
+  """
+  The jsonResponse field will soon be deprecated. Use new GraphQL types IF they exist.
+  """
+  jsonResponse: String
+}
+
+type ScoresBettingLink
+  @cacheControl(maxAge: 15)
+{
+  id: String
+  success: Boolean
+  ctaText: String
+  logo: String
+  logoNight: String
+  clickUrl: String
+  disclaimerText: String
+  disclaimerUrl: String
+  showLinkout: String
+  partner: ScoresOddsSportsbook
+  betting: Boolean
+  attributionText: String
+}
+
+type ScoresDescription
+  @cacheControl(inheritMaxAge: true)
+{
+  text: String
+}
+
+type ScoresEvent
+  @cacheControl(maxAge: 15)
+  @key(fields: "id")
+{
+  name: String
+  subName: String
+  nameLabels: [ScoresEventNameLabel]
+  id: String
+  descriptions: [ScoresDescription]
+  gameDate: String
+  sport: String
+  site: String
+  league: String
+  status: String
+  type: String
+  boxScore: String
+  gamecast: String
+  stream: String
+  participants: ScoresEventParticipant
+  progress: ScoresProgress
+  gameState: ScoresState
+  current: Boolean
+  gameEndDate: String
+  metadata: ScoresMetadata
+  odds: String
+  gamecastInformation: String
+}
+
+type ScoresEventNameLabel
+  @cacheControl(inheritMaxAge: true)
+{
+  text: String
+}
+
+type ScoresEventParticipant
+  @cacheControl(maxAge: 15)
+{
+  headers: ScoresEventParticipantHeader
+  entries: [ScoresEventParticipantEntry]
+}
+
+type ScoresEventParticipantHeader
+  @cacheControl(inheritMaxAge: true)
+{
+  value: String
+}
+
+type ScoresEventParticipantEntry
+  @cacheControl(inheritMaxAge: true)
+{
+  number: String
+  logo: String
+  name: String
+  abbrev: String
+  isWinner: Boolean
+  values: [ScoresEventParticipantEntryValue]
+}
+
+type ScoresEventParticipantEntryValue
+  @cacheControl(inheritMaxAge: true)
+{
+  value: String
+  fontFormatting: ScoresEventParticipantEntryFontFormatting
+}
+
+type ScoresEventParticipantEntryFontFormatting
+  @cacheControl(inheritMaxAge: true)
+{
+  fontIsBold: Boolean
+  fontColor: String
+  fontColorNight: String
+}
+
+"""The ScoresGame is an Entity so it can be extended in other subgraphs."""
+type ScoresGame
+  @cacheControl(maxAge: 15)
+  @key(fields: "id")
+{
+  name: String
+  id: String
+  descriptions: [ScoresDescription]
+  gameDate: String
+  sport: String
+  site: String
+  league: String
+  status: String
+  boxScore: String
+  gamecast: String
+  teamOne: ScoresGameTeam
+  teamTwo: ScoresGameTeam
+  progress: ScoresProgress
+  gameState: ScoresState
+  current: Boolean
+  gameEndDate: String
+  squadRide: SquadRide
+  metadata: ScoresMetadata
+  odds: String
+  gamecastInformation: String
+
+  """
+  For sports that display a PeriodScores array, this indicates the maximum number of PeriodScores objects possible for a regulation length game/match
+  """
+  maxPeriodScores: Int
+}
+
+type SquadRide
+  @cacheControl(inheritMaxAge: true)
+{
+  id: String
+  outcome: String
+}
+
+type GameGroup
+  @cacheControl(maxAge: 15)
+{
+  name: String
+  current: Boolean
+  games: [ScoresGame]
+  events: [ScoresEvent]
+}
+
+type ScoresGameTeam
+  @cacheControl(maxAge: 15)
+{
+  name: String
+  shortName: String
+  abbrev: String
+  hasPossession: Boolean
+  rank: Int
+  isWinner: Boolean
+  logo: String
+  score: String @deprecated(reason: "Use mainScore and secondaryScore instead")
+  mainScore: String
+  secondaryScore: String
+  record: String
+  odds: String
+  colors: [String]
+  permalink: String
+  competitors: [ScoresTeamCompetitor]
+  periodScores: [PeriodScore]
+
+  """
+  when true, the competitors are undecided, and the competitors array represents potential competitors for this team
+  """
+  virtual: Boolean
+}
+
+"""The League is an Entity so it can be extended in other subgraphs."""
+type ScoresLeague
+  @cacheControl(maxAge: 15)
+  @key(fields: "id")
+{
+  id: String
+  league: Int
+  name: String
+  current: Boolean
+  slug: String
+  tag: Tag @deprecated(reason: "Use slug field instead")
+  queryParameters: ScoresLeagueQueryParameters
+  children: [ScoresLeague]
+  href: String @deprecated
+}
+
+type ScoresLeagueQueryParameters {
+  context: String
+  league: StatsLeagues
+  date: String
+}
+
+type ScoresMetadata
+  @cacheControl(maxAge: 15)
+{
+  name: String
+  about: String
+  startDate: String
+  endDate: String
+  status: String
+  location: ScoresMetadataLocation
+}
+
+type ScoresMetadataLocation
+  @cacheControl(inheritMaxAge: true)
+{
+  name: String
+  city: String
+  state: String
+  zip: String
+  country: String
+}
+
+type ScoresCalendarNavigation
+  @cacheControl(maxAge: 15)
+{
+  previous: [NavigationElement]
+  next: [NavigationElement]
+  current: [NavigationElement]
+}
+
+type NavigationElement
+  @cacheControl(inheritMaxAge: true)
+{
+  name: String
+  href: String @deprecated(reason: "Use queryParameters instead")
+  queryParameters: NavigationQueryParameters
+}
+
+type NavigationQueryParameters {
+  date: String
+  league: StatsLeagues
+}
+
+type PeriodScore {
+  """
+  Number of the period - potentially used in conjunction with `type` for constructing a column header ("Set 1")
+  """
+  number: Int
+
+  """Primary Score Value"""
+  score: String
+
+  """Secondary Score Value (example: tiebreaks in tennis)"""
+  subscore: String
+
+  """Type of period - will vary by sport"""
+  type: PeriodScoreType
+}
+
+enum PeriodScoreType {
+  TennisSet
+}
+
+type ScoresProgress
+  @cacheControl(maxAge: 15)
+{
+  network: String
+  playPeriod: String
+  playPeriodCondensed: String
+  clock: String
+  inningPhase: String
+  round: String
+  venue: String
+}
+
+type ScoresTeamCompetitor {
+  abbrev: String
+  logo: String
+  name: String
+  rank: Int
+  slug: String
+
+  """
+  applicable in ScoresGame instances when some or all competitors of a ScoresGameTeam are TBD. This field identifies pairs of doubles players
+  """
+  team: Int
+}
+
+type ScoresState
+  @cacheControl(maxAge: 15)
+{
+  isRedZone: Boolean
+  balls: Int
+  strikes: Int
+  outs: Int
+  runners: ScoresStateRunners
+}
+
+type ScoresStateRunners
+  @cacheControl(inheritMaxAge: true)
+{
+  first: Boolean
+  second: Boolean
+  third: Boolean
+}
+
+type StatsStanding {
+  slug: String
+  tag: Tag @deprecated(reason: "Use slug field instead")
+  season: Int
+  name: String
+  standingGroupings: [StatsStandingGrouping]
+}
+
+type StatsStandingGrouping {
+  title: String
+  entries: [StatsStandingEntry]
+  adPlacement: [StatsStandingAdPlacement]
+}
+
+type StatsStandingAdPlacement {
+  adId: String
+  index: Int
+}
+
+type StatsStandingEntry {
+  title: String
+  current: Boolean
+  separator: StatsStandingSeparator
+  headers: [StatsStandingHeader]
+  teams: [StatsStandingTeam]
+  keys: [StatsStandingKey]
+}
+
+type StatsStandingSeparator {
+  color: String
+  index: Int
+}
+
+type StatsStandingHeader {
+  title: String
+}
+
+type StatsStandingTeam {
+  color: String
+  number: String
+  logo: String
+  name: String
+  superscript: String
+  current: Boolean
+  values: [StatsStandingValue]
+  returnColor: Boolean
+  prefixSuperscript: String
+  slug: String
+  tag: Tag @deprecated(reason: "Use slug field instead")
+}
+
+type StatsStandingValue {
+  value: String
+}
+
+type StatsStandingKey {
+  value: String
+  color: String
+  returnColor: Boolean
+}
+
+enum Actions {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+enum ChannelType {
+  League
+  SmallTeam
+  PopularTeam
+  Interest
+  GameCast
+  Home
+  Following
+  FollowingAddTags
+  Alerts
+  Discovery
+  Creator
+  User
+  Onboarding
+  OnboardingAddTags
+  Scores
+}
+
+enum CreatorTier {
+  Platinum
+  Gold
+  Silver
+  Bronze
+}
+
+enum SemanticID {
+  StatsGamecast
+  StatsScoreboard
+  StatsScorecard
+  StatsBetting
+  StatsVenue
+  StatsInjuryReport
+  StatsLiveOdds
+  StatsSeasonPerformance
+  StatsLeagueRankings
+  StatsGameInfo
+  StatsPreviousMeetings
+  StatsLineScore
+  StatsPlayPreview
+  StatsPlaySummary
+  StatsMatchTimeline
+  StatsDriveChart
+  StatsBaseball
+  StatsPlays
+  StatsGameStats
+  StatsTeamComparison
+  StatsOdds
+  StatsSeasonLeaders
+  StatsPlayersOnIce
+  StatsHockeyGameState
+  StatsPitchingInfo
+  StatsLineup
+  StatsSubstitutions
+  StatsStandings
+  StatsScores
+  StatsSchedule
+  StatsMoneyline
+  StatsTotalPoints
+  StatsSpread
+  StatsScoringPlays
+  StatsDrawNoBet
+  Header
+  UserHeader
+  SearchBar
+  Chat
+  ExternalLink
+  TrendingClips
+  Ads
+  TagFollowing
+  TagRecommended
+  TagOnboarding
+  TagSearch
+  ContentPremiumVideo
+  ContentSocialFeed
+  ContentCommunityFeed
+  ContentHighlights
+  ContentFullGameHighlights
+  ContentChannelFeed
+  ContentWhatsBuzzing
+  ContentTopHeadlines
+  ContentTrendingVideos
+  UgcFromTheFans
+  UgcFeed
+  UgcPosts
+  UgcComments
+  Dummy
+  AlertFollowingFeed
+  AlertActivitiesFeed
+  LiveAndUpcoming
+  LiveNow
+  LiveUpcoming
+  ContentHomeLandscape
+  ContentHomePortraitCollection
+  ContentHomeHeadlines
+  ContentHomeCommunityCollections
+  ContentShortGameHighlights
+  ContentTrendingBets
+  RecForYou
+  RecYouMightLike
+  RecCreatorsInYourCommunities
+  RecMostFollowedTeams
+  RecMostFollowedLeagues
+  RecTopInterests
+  RecTopCreators
+  RecRelatedCommunities
+  StatsPlayerStats
+  StatsScoresStrip
+  StatsThreeWayMoneyline
+  StatsHeadToHead
+  StatsPlayerProp
+  StatsPodium
+  StatsPodiumEntry
+  StatsRaceInfo
+  AffiliateWatchBanner
+}
+
+enum SemanticType {
+  AdsData
+  ContentModuleData
+  StatsData
+  SocialData
+  StatsPlaceholder
+  TagData
+  UserData
+  AlertData
+  Default
+  RecommendationData
+}
+
+enum Tenant {
+  aewGame
+  bleacherReport
+  estadioArgentina
+  estadioBrazil
+  estadioChile
+  ncaa
+}
+
+extend type TagV2
+  @key(fields: "hash", resolvable: false)
+{
+  hash: String @inaccessible
+  slug: String! @external
+}

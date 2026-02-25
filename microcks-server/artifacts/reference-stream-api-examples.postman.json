@@ -1,0 +1,86 @@
+{
+  "info": {
+    "_postman_id": "referencestreamapi-mocks-001",
+    "name": "ReferenceStreamAPI",
+    "description": "version=1.0 - Mock examples for ReferenceStreamAPI GraphQL service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "getReferenceStreamByName",
+      "request": {
+        "method": "POST",
+        "url": "http://getReferenceStreamByName",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getReferenceStreamByName($referenceStreamName: String!, $limit: Int) { getReferenceStreamByName(referenceStreamName: $referenceStreamName, limit: $limit) { id title description thumbnailUrl permalink url author { name } tag { id } } }\",\"variables\":{\"referenceStreamName\":\"Demo Name\",\"limit\":10}}"
+        }
+      },
+      "response": [
+        {
+          "name": "DemoName",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getReferenceStreamByName",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getReferenceStreamByName($referenceStreamName: String!, $limit: Int) { getReferenceStreamByName(referenceStreamName: $referenceStreamName, limit: $limit) { id title description thumbnailUrl permalink url author { name } tag { id } } }\",\"variables\":{\"referenceStreamName\":\"Demo Name\",\"limit\":10}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getReferenceStreamByName\":[{\"id\":\"id-id-001\",\"title\":\"Demo Title\",\"description\":\"A sample description for demo purposes\",\"thumbnailUrl\":\"https://example.com/demo\",\"permalink\":\"demo-permalink\",\"url\":\"https://example.com/demo\",\"author\":{\"name\":\"Demo Name\"},\"tag\":{\"id\":\"id-id-001\"},\"type\":\"InternalArticle\",\"metadata\":{\"genres\":[\"demo-genres\"],\"labels\":[{\"id\":\"id-id-001\"}],\"providerName\":\"Demo Name\",\"photoCredit\":\"demo-photoCredit\",\"shareUrl\":\"https://example.com/demo\",\"video\":{\"analytics\":null,\"duration\":1,\"hlsUrl\":\"https://example.com/demo\",\"mp4Url\":\"https://example.com/demo\",\"videoUrl\":\"https://example.com/demo\",\"videoId\":1,\"impressionTracking\":[],\"width\":1,\"height\":1,\"state\":\"demo-state\"},\"gamecast\":{\"gamePermalink\":\"demo-permalink\",\"analytics\":null,\"scoreBoard\":null}},\"createdAt\":\"2026-02-20T10:00:00Z\",\"updatedAt\":\"2026-02-20\"}]}}"
+        }
+      ]
+    },
+    {
+      "name": "getReferenceStreamByComponentId",
+      "request": {
+        "method": "POST",
+        "url": "http://getReferenceStreamByComponentId",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getReferenceStreamByComponentId($componentID: String!, $limit: Int) { getReferenceStreamByComponentId(componentID: $componentID, limit: $limit) { id name tag { id } type references { id title description thumbnailUrl } } }\",\"variables\":{\"componentID\":\"id-12345\",\"limit\":10}}"
+        }
+      },
+      "response": [
+        {
+          "name": "id-12345",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getReferenceStreamByComponentId",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getReferenceStreamByComponentId($componentID: String!, $limit: Int) { getReferenceStreamByComponentId(componentID: $componentID, limit: $limit) { id name tag { id } type references { id title description thumbnailUrl } } }\",\"variables\":{\"componentID\":\"id-12345\",\"limit\":10}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getReferenceStreamByComponentId\":{\"id\":\"id-id-001\",\"name\":\"Demo Name\",\"tag\":{\"id\":\"id-id-001\"},\"type\":\"DEFAULT\",\"references\":[{\"id\":\"id-id-001\",\"title\":\"Demo Title\",\"description\":\"A sample description for demo purposes\",\"thumbnailUrl\":\"https://example.com/demo\",\"permalink\":\"demo-permalink\",\"url\":\"https://example.com/demo\",\"author\":{\"name\":\"Demo Name\"},\"tag\":{\"id\":\"id-id-001\"},\"type\":\"InternalArticle\",\"metadata\":{\"genres\":[\"demo-genres\"],\"labels\":[],\"providerName\":\"Demo Name\",\"photoCredit\":\"demo-photoCredit\",\"shareUrl\":\"https://example.com/demo\",\"video\":null,\"gamecast\":null},\"createdAt\":\"2026-02-20T10:00:00Z\",\"updatedAt\":\"2026-02-20\"}]}}}"
+        }
+      ]
+    }
+  ]
+}

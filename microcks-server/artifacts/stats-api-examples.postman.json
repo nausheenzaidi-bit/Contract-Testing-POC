@@ -1,0 +1,314 @@
+{
+  "info": {
+    "_postman_id": "statsapi-mocks-001",
+    "name": "StatsAPI",
+    "description": "version=1.0 - Mock examples for StatsAPI GraphQL service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "getGamesByGameDate",
+      "request": {
+        "method": "POST",
+        "url": "http://getGamesByGameDate",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getGamesByGameDate($startDate: String!, $endDate: String!, $timezone: Int!, $sortOrder: SortOrder, $status: [Status], $stateStatus: [StateStatus], $leagues: [StatsLeagues]) { getGamesByGameDate(startDate: $startDate, endDate: $endDate, timezone: $timezone, sortOrder: $sortOrder, status: $status, stateStatus: $stateStatus, leagues: $leagues) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"startDate\":\"2026-02-20\",\"endDate\":\"2026-02-20\",\"timezone\":-5,\"sortOrder\":{},\"status\":{},\"stateStatus\":{},\"leagues\":{}}}"
+        }
+      },
+      "response": [
+        {
+          "name": "2026-02-20",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getGamesByGameDate",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getGamesByGameDate($startDate: String!, $endDate: String!, $timezone: Int!, $sortOrder: SortOrder, $status: [Status], $stateStatus: [StateStatus], $leagues: [StatsLeagues]) { getGamesByGameDate(startDate: $startDate, endDate: $endDate, timezone: $timezone, sortOrder: $sortOrder, status: $status, stateStatus: $stateStatus, leagues: $leagues) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"startDate\":\"2026-02-20\",\"endDate\":\"2026-02-20\",\"timezone\":-5,\"sortOrder\":{},\"status\":{},\"stateStatus\":{},\"leagues\":{}}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getGamesByGameDate\":[{\"away\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"gameDate\":{\"epoch\":1,\"iso8501\":\"demo-iso8501\"},\"gameProgress\":{\"clock\":{\"hours\":\"demo-hours\",\"milliseconds\":\"demo-milliseconds\",\"minutes\":\"demo-minutes\",\"seconds\":\"demo-seconds\",\"stoppage\":\"demo-stoppage\"},\"currentPeriod\":\"demo-currentPeriod\",\"displayPrimary\":\"demo-displayPrimary\",\"displaySecondary\":\"demo-displaySecondary\",\"totalPeriods\":\"demo-totalPeriods\"},\"home\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"id\":\"id-12345\",\"name\":\"Demo Name\",\"score\":{\"away\":1,\"home\":1},\"sourceGameId\":\"id-12345\",\"sport\":{\"league\":\"MLB\",\"sport\":\"Football\"},\"sportradar_id\":\"id-12345\",\"stateStatus\":\"Scheduled\",\"status\":\"Active\",\"weekId\":\"id-12345\"}]}}"
+        }
+      ]
+    },
+    {
+      "name": "getGamesByGameIds",
+      "request": {
+        "method": "POST",
+        "url": "http://getGamesByGameIds",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getGamesByGameIds($gameIds: [String]!) { getGamesByGameIds(gameIds: $gameIds) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"gameIds\":\"id-12345\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "id-12345",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getGamesByGameIds",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getGamesByGameIds($gameIds: [String]!) { getGamesByGameIds(gameIds: $gameIds) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"gameIds\":\"id-12345\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getGamesByGameIds\":[{\"away\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"gameDate\":{\"epoch\":1,\"iso8501\":\"demo-iso8501\"},\"gameProgress\":{\"clock\":{\"hours\":\"demo-hours\",\"milliseconds\":\"demo-milliseconds\",\"minutes\":\"demo-minutes\",\"seconds\":\"demo-seconds\",\"stoppage\":\"demo-stoppage\"},\"currentPeriod\":\"demo-currentPeriod\",\"displayPrimary\":\"demo-displayPrimary\",\"displaySecondary\":\"demo-displaySecondary\",\"totalPeriods\":\"demo-totalPeriods\"},\"home\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"id\":\"id-12345\",\"name\":\"Demo Name\",\"score\":{\"away\":1,\"home\":1},\"sourceGameId\":\"id-12345\",\"sport\":{\"league\":\"MLB\",\"sport\":\"Football\"},\"sportradar_id\":\"id-12345\",\"stateStatus\":\"Scheduled\",\"status\":\"Active\",\"weekId\":\"id-12345\"}]}}"
+        }
+      ]
+    },
+    {
+      "name": "getGamesBySportRadarIds",
+      "request": {
+        "method": "POST",
+        "url": "http://getGamesBySportRadarIds",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getGamesBySportRadarIds($gameIds: [String]!) { getGamesBySportRadarIds(gameIds: $gameIds) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"gameIds\":\"id-12345\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "id-12345",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getGamesBySportRadarIds",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getGamesBySportRadarIds($gameIds: [String]!) { getGamesBySportRadarIds(gameIds: $gameIds) { away { abbreviation draws logo losses } gameDate { epoch iso8501 } gameProgress { currentPeriod displayPrimary displaySecondary } home { abbreviation draws logo losses } id name score { away home } sourceGameId } }\",\"variables\":{\"gameIds\":\"id-12345\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getGamesBySportRadarIds\":[{\"away\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"gameDate\":{\"epoch\":1,\"iso8501\":\"demo-iso8501\"},\"gameProgress\":{\"clock\":{\"hours\":\"demo-hours\",\"milliseconds\":\"demo-milliseconds\",\"minutes\":\"demo-minutes\",\"seconds\":\"demo-seconds\",\"stoppage\":\"demo-stoppage\"},\"currentPeriod\":\"demo-currentPeriod\",\"displayPrimary\":\"demo-displayPrimary\",\"displaySecondary\":\"demo-displaySecondary\",\"totalPeriods\":\"demo-totalPeriods\"},\"home\":{\"abbreviation\":\"DMO\",\"draws\":\"demo-draws\",\"logo\":\"demo-logo\",\"losses\":\"demo-losses\",\"market\":\"demo-market\",\"mascot\":\"demo-mascot\",\"name\":\"Demo Name\",\"wins\":\"demo-wins\"},\"id\":\"id-12345\",\"name\":\"Demo Name\",\"score\":{\"away\":1,\"home\":1},\"sourceGameId\":\"id-12345\",\"sport\":{\"league\":\"MLB\",\"sport\":\"Football\"},\"sportradar_id\":\"id-12345\",\"stateStatus\":\"Scheduled\",\"status\":\"Active\",\"weekId\":\"id-12345\"}]}}"
+        }
+      ]
+    },
+    {
+      "name": "getScores",
+      "request": {
+        "method": "POST",
+        "url": "http://getScores",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getScores($timezone: Int!, $date: String, $league: StatsLeagues, $context: String, $locale: String, $tags: [Int], $slugs: [String]) { getScores(timezone: $timezone, date: $date, league: $league, context: $context, locale: $locale, tags: $tags, slugs: $slugs) { leagues { id league name current } gameGroups { name current } bettingLink { id success ctaText logo } hash } }\",\"variables\":{\"timezone\":-5,\"date\":\"2026-02-20\",\"league\":{},\"context\":\"Sample text content\",\"locale\":\"demo-locale\",\"tags\":1,\"slugs\":\"demo-slug-001\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "-5",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getScores",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getScores($timezone: Int!, $date: String, $league: StatsLeagues, $context: String, $locale: String, $tags: [Int], $slugs: [String]) { getScores(timezone: $timezone, date: $date, league: $league, context: $context, locale: $locale, tags: $tags, slugs: $slugs) { leagues { id league name current } gameGroups { name current } bettingLink { id success ctaText logo } hash } }\",\"variables\":{\"timezone\":-5,\"date\":\"2026-02-20\",\"league\":{},\"context\":\"Sample text content\",\"locale\":\"demo-locale\",\"tags\":1,\"slugs\":\"demo-slug-001\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getScores\":{\"calendarNavigation\":{\"previous\":[{\"name\":\"Demo Name\",\"href\":\"demo-href\",\"queryParameters\":null}],\"next\":[{\"name\":\"Demo Name\",\"href\":\"demo-href\",\"queryParameters\":null}],\"current\":[{\"name\":\"Demo Name\",\"href\":\"demo-href\",\"queryParameters\":null}]},\"leagues\":[{\"id\":\"id-12345\",\"league\":1,\"name\":\"Demo Name\",\"current\":true,\"slug\":\"demo-slug-001\",\"tag\":{\"permalink\":\"demo-permalink\"},\"queryParameters\":{\"context\":\"Sample text content\",\"league\":\"MLB\",\"date\":\"2026-02-20\"},\"children\":[{\"id\":\"id-12345\",\"league\":1,\"name\":\"Demo Name\",\"current\":true,\"slug\":\"demo-slug-001\",\"tag\":null,\"queryParameters\":null,\"children\":[],\"href\":\"demo-href\"}],\"href\":\"demo-href\"}],\"gameGroups\":[{\"name\":\"Demo Name\",\"current\":true,\"games\":[{\"name\":\"Demo Name\",\"id\":\"id-12345\",\"descriptions\":[],\"gameDate\":\"2026-02-20\",\"sport\":\"Football\",\"site\":\"demo-site\",\"league\":\"NFL\",\"status\":\"Active\",\"boxScore\":\"21\",\"gamecast\":\"demo-gamecast\",\"teamOne\":null,\"teamTwo\":null,\"progress\":null,\"gameState\":null,\"current\":true,\"gameEndDate\":\"2026-02-20\",\"squadRide\":null,\"metadata\":null,\"odds\":\"demo-odds\",\"gamecastInformation\":\"demo-gamecastInformation\",\"maxPeriodScores\":21}],\"events\":[{\"name\":\"Demo Name\",\"subName\":\"Demo Name\",\"nameLabels\":[],\"id\":\"id-12345\",\"descriptions\":[],\"gameDate\":\"2026-02-20\",\"sport\":\"Football\",\"site\":\"demo-site\",\"league\":\"NFL\",\"status\":\"Active\",\"type\":\"DEFAULT\",\"boxScore\":\"21\",\"gamecast\":\"demo-gamecast\",\"stream\":\"demo-stream\",\"participants\":null,\"progress\":null,\"gameState\":null,\"current\":true,\"gameEndDate\":\"2026-02-20\",\"metadata\":null,\"odds\":\"demo-odds\",\"gamecastInformation\":\"demo-gamecastInformation\"}]}],\"bettingLink\":{\"id\":\"id-12345\",\"success\":true,\"ctaText\":\"Sample text content\",\"logo\":\"demo-logo\",\"logoNight\":\"demo-logoNight\",\"clickUrl\":\"https://example.com/demo\",\"disclaimerText\":\"Sample text content\",\"disclaimerUrl\":\"https://example.com/demo\",\"showLinkout\":\"demo-showLinkout\",\"partner\":\"Caesars\",\"betting\":true,\"attributionText\":\"Sample text content\"},\"hash\":\"demo-hash\"}}}"
+        }
+      ]
+    },
+    {
+      "name": "getStandings",
+      "request": {
+        "method": "POST",
+        "url": "http://getStandings",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getStandings($permalink: String!, $season: Int) { getStandings(permalink: $permalink, season: $season) { slug tag { permalink } season name standingGroupings { title } } }\",\"variables\":{\"permalink\":\"demo-permalink\",\"season\":2026}}"
+        }
+      },
+      "response": [
+        {
+          "name": "demo-permalink",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getStandings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getStandings($permalink: String!, $season: Int) { getStandings(permalink: $permalink, season: $season) { slug tag { permalink } season name standingGroupings { title } } }\",\"variables\":{\"permalink\":\"demo-permalink\",\"season\":2026}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getStandings\":{\"slug\":\"demo-slug-001\",\"tag\":{\"permalink\":\"demo-permalink\"},\"season\":2026,\"name\":\"Demo Name\",\"standingGroupings\":[{\"title\":\"Demo Title\",\"entries\":[{\"title\":\"Demo Title\",\"current\":true,\"separator\":null,\"headers\":[],\"teams\":[],\"keys\":[]}],\"adPlacement\":[{\"adId\":\"id-12345\",\"index\":1}]}]}}}"
+        }
+      ]
+    },
+    {
+      "name": "getGamecastBySlug",
+      "request": {
+        "method": "POST",
+        "url": "http://getGamecastBySlug",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getGamecastBySlug($slug: String!) { getGamecastBySlug(slug: $slug) { tag { hash slug } slug scoreLeaderboard { name subName id } gameDate podium { title } raceInfo { distance distanceUnit laps name } scoreboard { gameDate } } }\",\"variables\":{\"slug\":\"demo-slug-001\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "demo-slug-001",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getGamecastBySlug",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getGamecastBySlug($slug: String!) { getGamecastBySlug(slug: $slug) { tag { hash slug } slug scoreLeaderboard { name subName id } gameDate podium { title } raceInfo { distance distanceUnit laps name } scoreboard { gameDate } } }\",\"variables\":{\"slug\":\"demo-slug-001\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getGamecastBySlug\":{\"tag\":{\"hash\":\"demo-hash\",\"slug\":\"demo-slug-001\"},\"slug\":\"demo-slug-001\",\"scoreLeaderboard\":{\"name\":\"Demo Name\",\"subName\":\"Demo Name\",\"nameLabels\":[{\"text\":\"Sample text content\"}],\"id\":\"id-12345\",\"descriptions\":[{\"text\":\"Sample text content\"}],\"gameDate\":\"2026-02-20\",\"sport\":\"Football\",\"site\":\"demo-site\",\"league\":\"NFL\",\"status\":\"Active\",\"type\":\"DEFAULT\",\"boxScore\":\"21\",\"gamecast\":\"demo-gamecast\",\"stream\":\"demo-stream\",\"participants\":{\"headers\":null,\"entries\":[]},\"progress\":{\"network\":\"demo-network\",\"playPeriod\":\"Q1\",\"playPeriodCondensed\":\"Q1\",\"clock\":\"12:00\",\"inningPhase\":\"demo-inningPhase\",\"round\":\"demo-round\",\"venue\":\"demo-venue\"},\"gameState\":{\"isRedZone\":true,\"balls\":1,\"strikes\":1,\"outs\":1,\"runners\":null},\"current\":true,\"gameEndDate\":\"2026-02-20\",\"metadata\":{\"name\":\"Demo Name\",\"about\":\"demo-about\",\"startDate\":\"2026-02-20\",\"endDate\":\"2026-02-20\",\"status\":\"Active\",\"location\":null},\"odds\":\"demo-odds\",\"gamecastInformation\":\"demo-gamecastInformation\"},\"gameDate\":\"2026-02-20\",\"linescore\":{\"gameState\":{\"balls\":1,\"batter\":null,\"outs\":1,\"pitcher\":null,\"runners\":null,\"strikes\":1},\"headers\":[{\"value\":\"demo-value\"}],\"summaryHeaders\":[{\"value\":\"demo-value\"}],\"teamOne\":{\"colors\":[\"demo-colors\"],\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"record\":\"10-2\",\"summaryValues\":[],\"values\":[]},\"teamTwo\":{\"colors\":[\"demo-colors\"],\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"record\":\"10-2\",\"summaryValues\":[],\"values\":[]},\"title\":\"Demo Title\"},\"podium\":{\"entries\":[{\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"place\":\"demo-place\",\"result\":\"demo-result\",\"subResult\":\"demo-subResult\"}],\"title\":\"Demo Title\"},\"raceInfo\":{\"distance\":\"demo-distance\",\"distanceUnit\":\"demo-distanceUnit\",\"laps\":\"demo-laps\",\"name\":\"Demo Name\",\"status\":\"Scheduled\",\"type\":\"DEFAULT\"},\"scoreboard\":{\"gameDate\":\"2026-02-20\",\"progress\":{\"network\":\"demo-network\",\"playPeriod\":\"Q1\",\"playPeriodCondensed\":\"Q1\",\"clock\":\"12:00\",\"inningPhase\":\"demo-inningPhase\",\"round\":\"demo-round\",\"venue\":\"demo-venue\"},\"teamOne\":{\"name\":\"Demo Name\",\"shortName\":\"Demo Name\",\"abbrev\":\"DMO\",\"hasPossession\":true,\"rank\":1,\"isWinner\":true,\"logo\":\"demo-logo\",\"score\":\"21\",\"mainScore\":\"21\",\"secondaryScore\":\"21\",\"record\":\"10-2\",\"odds\":\"demo-odds\",\"colors\":[\"demo-colors\"],\"permalink\":\"demo-permalink\",\"competitors\":[],\"periodScores\":[],\"virtual\":true},\"teamTwo\":{\"name\":\"Demo Name\",\"shortName\":\"Demo Name\",\"abbrev\":\"DMO\",\"hasPossession\":true,\"rank\":1,\"isWinner\":true,\"logo\":\"demo-logo\",\"score\":\"21\",\"mainScore\":\"21\",\"secondaryScore\":\"21\",\"record\":\"10-2\",\"odds\":\"demo-odds\",\"colors\":[\"demo-colors\"],\"permalink\":\"demo-permalink\",\"competitors\":[],\"periodScores\":[],\"virtual\":true}},\"sport\":\"Football\",\"status\":\"Scheduled\",\"venue\":{\"location\":\"demo-location\",\"stadium\":\"demo-stadium\",\"weatherEmoji\":\"demo-weatherEmoji\",\"weatherPrimary\":\"demo-weatherPrimary\",\"weatherSecondary\":\"demo-weatherSecondary\"},\"jsonResponse\":\"demo-jsonResponse\"}}}"
+        }
+      ]
+    },
+    {
+      "name": "getSchedule",
+      "request": {
+        "method": "POST",
+        "url": "http://getSchedule",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getSchedule($slug: String!, $timezone: Int, $season: Int) { getSchedule(slug: $slug, timezone: $timezone, season: $season) { adPlacement { adId gameRowIndex groupIndex repeatOffset } league name slug scheduleGroupings { current title } } }\",\"variables\":{\"slug\":\"demo-slug-001\",\"timezone\":-5,\"season\":2026}}"
+        }
+      },
+      "response": [
+        {
+          "name": "demo-slug-001",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getSchedule",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getSchedule($slug: String!, $timezone: Int, $season: Int) { getSchedule(slug: $slug, timezone: $timezone, season: $season) { adPlacement { adId gameRowIndex groupIndex repeatOffset } league name slug scheduleGroupings { current title } } }\",\"variables\":{\"slug\":\"demo-slug-001\",\"timezone\":-5,\"season\":2026}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getSchedule\":{\"adPlacement\":[{\"adId\":\"id-12345\",\"gameRowIndex\":1,\"groupIndex\":1,\"repeatOffset\":1}],\"league\":\"NFL\",\"name\":\"Demo Name\",\"slug\":\"demo-slug-001\",\"scheduleGroupings\":[{\"current\":true,\"title\":\"Demo Title\",\"entries\":[{\"group\":\"demo-group\",\"current\":true,\"date\":\"2026-02-20\",\"slug\":\"demo-slug-001\",\"homeAway\":\"demo-homeAway\",\"isoUtcDatetime\":\"2026-02-20\",\"opponent\":\"demo-opponent\",\"opponentLogo\":\"demo-opponentLogo\",\"resultDescription\":\"A sample description for demo purposes\",\"startTimeTbd\":true,\"status\":\"Scheduled\",\"location\":null,\"resultCode\":null,\"ticketInfo\":null}],\"key\":[{\"value\":\"demo-value\",\"color\":\"demo-color\",\"returnColor\":true}],\"link\":{\"title\":\"Demo Title\",\"type\":\"DEFAULT\",\"value\":\"demo-value\"}}]}}}"
+        }
+      ]
+    },
+    {
+      "name": "getGameCastByTagUUID",
+      "request": {
+        "method": "POST",
+        "url": "http://getGameCastByTagUUID",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"query\":\"query getGameCastByTagUUID($uuid: String!) { getGameCastByTagUUID(uuid: $uuid) { tag { hash slug } slug scoreLeaderboard { name subName id } gameDate podium { title } raceInfo { distance distanceUnit laps name } scoreboard { gameDate } } }\",\"variables\":{\"uuid\":\"id-12345\"}}"
+        }
+      },
+      "response": [
+        {
+          "name": "id-12345",
+          "originalRequest": {
+            "method": "POST",
+            "url": "http://getGameCastByTagUUID",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"query\":\"query getGameCastByTagUUID($uuid: String!) { getGameCastByTagUUID(uuid: $uuid) { tag { hash slug } slug scoreLeaderboard { name subName id } gameDate podium { title } raceInfo { distance distanceUnit laps name } scoreboard { gameDate } } }\",\"variables\":{\"uuid\":\"id-12345\"}}"
+            }
+          },
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\"data\":{\"getGameCastByTagUUID\":{\"tag\":{\"hash\":\"demo-hash\",\"slug\":\"demo-slug-001\"},\"slug\":\"demo-slug-001\",\"scoreLeaderboard\":{\"name\":\"Demo Name\",\"subName\":\"Demo Name\",\"nameLabels\":[{\"text\":\"Sample text content\"}],\"id\":\"id-12345\",\"descriptions\":[{\"text\":\"Sample text content\"}],\"gameDate\":\"2026-02-20\",\"sport\":\"Football\",\"site\":\"demo-site\",\"league\":\"NFL\",\"status\":\"Active\",\"type\":\"DEFAULT\",\"boxScore\":\"21\",\"gamecast\":\"demo-gamecast\",\"stream\":\"demo-stream\",\"participants\":{\"headers\":null,\"entries\":[]},\"progress\":{\"network\":\"demo-network\",\"playPeriod\":\"Q1\",\"playPeriodCondensed\":\"Q1\",\"clock\":\"12:00\",\"inningPhase\":\"demo-inningPhase\",\"round\":\"demo-round\",\"venue\":\"demo-venue\"},\"gameState\":{\"isRedZone\":true,\"balls\":1,\"strikes\":1,\"outs\":1,\"runners\":null},\"current\":true,\"gameEndDate\":\"2026-02-20\",\"metadata\":{\"name\":\"Demo Name\",\"about\":\"demo-about\",\"startDate\":\"2026-02-20\",\"endDate\":\"2026-02-20\",\"status\":\"Active\",\"location\":null},\"odds\":\"demo-odds\",\"gamecastInformation\":\"demo-gamecastInformation\"},\"gameDate\":\"2026-02-20\",\"linescore\":{\"gameState\":{\"balls\":1,\"batter\":null,\"outs\":1,\"pitcher\":null,\"runners\":null,\"strikes\":1},\"headers\":[{\"value\":\"demo-value\"}],\"summaryHeaders\":[{\"value\":\"demo-value\"}],\"teamOne\":{\"colors\":[\"demo-colors\"],\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"record\":\"10-2\",\"summaryValues\":[],\"values\":[]},\"teamTwo\":{\"colors\":[\"demo-colors\"],\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"record\":\"10-2\",\"summaryValues\":[],\"values\":[]},\"title\":\"Demo Title\"},\"podium\":{\"entries\":[{\"logo\":\"demo-logo\",\"name\":\"Demo Name\",\"place\":\"demo-place\",\"result\":\"demo-result\",\"subResult\":\"demo-subResult\"}],\"title\":\"Demo Title\"},\"raceInfo\":{\"distance\":\"demo-distance\",\"distanceUnit\":\"demo-distanceUnit\",\"laps\":\"demo-laps\",\"name\":\"Demo Name\",\"status\":\"Scheduled\",\"type\":\"DEFAULT\"},\"scoreboard\":{\"gameDate\":\"2026-02-20\",\"progress\":{\"network\":\"demo-network\",\"playPeriod\":\"Q1\",\"playPeriodCondensed\":\"Q1\",\"clock\":\"12:00\",\"inningPhase\":\"demo-inningPhase\",\"round\":\"demo-round\",\"venue\":\"demo-venue\"},\"teamOne\":{\"name\":\"Demo Name\",\"shortName\":\"Demo Name\",\"abbrev\":\"DMO\",\"hasPossession\":true,\"rank\":1,\"isWinner\":true,\"logo\":\"demo-logo\",\"score\":\"21\",\"mainScore\":\"21\",\"secondaryScore\":\"21\",\"record\":\"10-2\",\"odds\":\"demo-odds\",\"colors\":[\"demo-colors\"],\"permalink\":\"demo-permalink\",\"competitors\":[],\"periodScores\":[],\"virtual\":true},\"teamTwo\":{\"name\":\"Demo Name\",\"shortName\":\"Demo Name\",\"abbrev\":\"DMO\",\"hasPossession\":true,\"rank\":1,\"isWinner\":true,\"logo\":\"demo-logo\",\"score\":\"21\",\"mainScore\":\"21\",\"secondaryScore\":\"21\",\"record\":\"10-2\",\"odds\":\"demo-odds\",\"colors\":[\"demo-colors\"],\"permalink\":\"demo-permalink\",\"competitors\":[],\"periodScores\":[],\"virtual\":true}},\"sport\":\"Football\",\"status\":\"Scheduled\",\"venue\":{\"location\":\"demo-location\",\"stadium\":\"demo-stadium\",\"weatherEmoji\":\"demo-weatherEmoji\",\"weatherPrimary\":\"demo-weatherPrimary\",\"weatherSecondary\":\"demo-weatherSecondary\"},\"jsonResponse\":\"demo-jsonResponse\"}}}"
+        }
+      ]
+    }
+  ]
+}

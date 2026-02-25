@@ -1,0 +1,738 @@
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+
+directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
+
+directive @key(fields: _FieldSet!, resolvable: Boolean = true) on OBJECT | INTERFACE
+
+directive @extends on OBJECT
+
+directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @shareable repeatable on FIELD_DEFINITION | OBJECT
+
+directive @override(from: String!) on FIELD_DEFINITION
+
+type Channel @key(fields: "uuid") {
+  uuid: String!
+  tag: TagV2! @external
+  pinnedContentModule: ContentModule @cacheControl(maxAge: 30, scope: PRIVATE) @requires(fields: "tag { uuid}")
+}
+
+enum TagTypeV2 {
+  Conference
+  Creator
+  Division
+  Editor
+  Editorial
+  Event
+  GameCast
+  Interest
+  League
+  Page
+  Player
+  Person
+  Sport
+  Team
+}
+
+type TagV2 @key(fields: "hash") {
+  hash: String @inaccessible
+  tagUUID: String
+  uuid: String! @external
+  type: TagTypeV2 @external
+  followersCount(tenant: Tenant!): Int! @external
+  startTime: Date @external
+  endTime: Date @external
+  children: [TagV2] @external
+  parent: TagV2 @external
+  slug: String! @external
+}
+
+type ComponentModule @key(fields: "hash") @cacheControl(inheritMaxAge: true) {
+  """Hashed string used for sharing information with other graphs"""
+  hash: String
+  semanticID: SemanticID
+  tag(tenant: Tenant!): TagV2
+  position: Int!
+  isPositionLocked: Boolean
+  positionLockExpiresAt: Date
+  """Date and time that the Content Modules was programmed into the Channel"""
+  insertedAt: Date
+  isPinned: Boolean
+}
+
+interface ContentModule @key(fields: "id") @cacheControl(maxAge: 60) {
+  id: ID!
+  """Also known as Headline, that's the heading text of a content module."""
+  title: String!
+  """
+  Also known as Commentary, short description of the content of a content module.
+  """
+  description: String!
+  """
+  Date and Time when a content module will not be visible anymore for end users. The state will be `UNPROGRAMMED`.
+  """
+  expiresAt: Date
+  """
+  Date and Time when a content module will start to be visible for end users. The state will be `SCHEDULED`.
+  """
+  scheduledDate: Date
+  """
+  List of possible states of content module. One of `SCHEDULED`, `PROGRAMMED` or `UNPROGRAMMED`.
+  """
+  state: ModuleState
+  """
+  List of Channels/Components (tag + semanticID) a content module is programmed to.
+  """
+  components: [ComponentModule]
+  """Indicates if a push notification was sent to the content module."""
+  isAlerted: Boolean
+  """List of countries that a content module will be visible."""
+  allowedCountries: [String]
+  commentsEnabled: Boolean
+  """Indicates to what tagUUID the content module was alerted to."""
+  alertedChannelTagUUID: String
+  """Date and time that a content module was last updated."""
+  updatedAt: Date
+  """Date and time that the Content Modules was created."""
+  insertedAt: Date
+  """
+  Metadata containing community tag, author, and brand information for logos and display.
+  """
+  metaData: ModuleMetaData
+}
+
+enum ContentModuleType {
+  Article
+  ExternalArticle
+  StatsBetting
+  StatsGamecast
+  Tweet
+  UGCImagePoll
+  UGCTextPoll
+  UGCPost
+  VideoV2
+  Mixed
+}
+
+enum ModuleOrientation {
+  Landscape
+  Portrait
+}
+
+type StandaloneContentModule implements ContentModule @key(fields: "type contentID") {
+  id: ID!
+  """Type of the content of a content module, e.g: Article, Video, Tweet"""
+  type: ContentModuleType!
+  """ID of the content of a content module."""
+  contentID: String
+  """Also known as Headline, that's the heading text of a content module."""
+  title: String!
+  """
+  Also known as Commentary, short description of the content of a content module.
+  """
+  description: String!
+  """Thumbnail URL of the content module"""
+  thumbnail: String!
+  """
+  Audit only field to capture the last system or person that updated the content module.
+  """
+  lastModifiedBy: String
+  """The content object, will be resolved by one of the downstream graphs."""
+  content: ProgrammedContent!
+  """Content module orientation, one of: Landscape or Portrait"""
+  orientation: ModuleOrientation!
+  """
+  Date and Time when a content module will not be visible anymore for end users. The state will be `UNPROGRAMMED`.
+  """
+  expiresAt: Date
+  """
+  Date and Time when a content module will start to be visible for end users. The state will be `SCHEDULED`.
+  """
+  scheduledDate: Date
+  """
+  List of possible states of content module. One of `SCHEDULED`, `PROGRAMMED` or `UNPROGRAMMED`.
+  """
+  state: ModuleState
+  """
+  List of Channels/Components (tag + semanticID) a content module is programmed to.
+  """
+  components: [ComponentModule]
+  """Indicates if a push notification was sent to the content module."""
+  isAlerted: Boolean
+  """List of countries that a content module will be visible."""
+  allowedCountries: [String]
+  composites: [PackageContentModule]
+  commentsEnabled: Boolean
+  """Indicates to what tagUUID the content module was alerted to."""
+  alertedChannelTagUUID: String
+  """Date and time that a content module was last updated."""
+  updatedAt: Date
+  thumbnailAccreditation: String
+  thumbnailCopyright: String
+  position: Int
+  isPositionLocked: Boolean
+  positionLockExpiresAt: Date
+  contentMetadata: ContentMetadata
+  """Date and time that the Content Modules was created."""
+  insertedAt: Date
+  """
+  Date and Time that the Content Module was last updated, considering the programming relevant fields (title, description, thumbnail, contentID/contentType)
+  """
+  programmingUpdatedAt: Date
+  """
+  Identifies content modules created with the same contentID and contentType for Social features.
+  """
+  wrapperContentModuleId: ID
+  """
+  Metadata containing community tag, author, and brand information for logos and display.
+  """
+  metaData: ModuleMetaData
+}
+
+enum PackageType {
+  TopHeadlines
+  TrendingVideos
+  WhatsBuzzing
+  CreatorShows
+  FromTheFans
+  AdHoc
+  TrendingBets
+  Highlights
+  HomeLandscape
+  HomePortrait
+}
+
+type PackageContentModule implements ContentModule @key(fields: "id") @cacheControl(maxAge: 60) {
+  id: ID!
+  """Also known as Headline, that's the heading text of a content module."""
+  title: String!
+  """
+  Also known as Commentary, short description of the content of a content module.
+  """
+  description: String!
+  """packageTag of composite data"""
+  packageTag: String
+  """
+  Type of the package, defines if a package is one of the static package or ad hoc.
+  """
+  packageType: PackageType
+  """Type of the content that will be accepted by the package."""
+  contentType: ContentModuleType
+  """List of contents of the package."""
+  contents: [StandaloneContentModule] @cacheControl(maxAge: 30)
+  """Content module orientation, one of: Landscape or Portrait"""
+  orientation: ModuleOrientation!
+  """
+  Date and Time when a content module will not be visible anymore for end users. The state will be `UNPROGRAMMED`.
+  """
+  expiresAt: Date
+  """
+  Date and Time when a content module will start to be visible for end users. The state will be `SCHEDULED`.
+  """
+  scheduledDate: Date
+  """
+  List of possible states of content module. One of `SCHEDULED`, `PROGRAMMED` or `UNPROGRAMMED`.
+  """
+  state: ModuleState
+  """
+  List of Channels/Components (tag + semanticID) a content module is programmed to.
+  """
+  components: [ComponentModule]
+  """Indicates if a push notification was sent to the content module."""
+  isAlerted: Boolean
+  """List of countries that a content module will be visible."""
+  allowedCountries: [String]
+  commentsEnabled: Boolean
+  """Indicates to what tagUUID the content module was alerted to."""
+  alertedChannelTagUUID: String
+  """Date and time that a content module was last updated."""
+  updatedAt: Date
+  """Date and time that the Content Modules was created"""
+  insertedAt: Date
+  """
+  Metadata containing community tag, author, and brand information for logos and display.
+  """
+  metaData: ModuleMetaData
+}
+
+type Content @key(fields: "_id") {
+  _id: MongoID @external
+  contentModules: [ContentModule]
+}
+
+type ChannelComponent @key(fields: "uuid") {
+  uuid: String!
+  tagUUID: String @external
+  semanticID: SemanticID @external
+  semanticType: SemanticType @external
+  tagSlug: String @external
+  tagData: [TagV2] @external
+  userTags(tenant: Tenant!): [TagV2] @external
+  interlacingInterval: Int @external
+  contents(
+    """
+    A list of States to filter content modules by. Default value: PROGRAMMED
+    """
+    state: [ModuleState] = [PROGRAMMED]
+    """Limit the number of returned Content Modules. Defaults to 150"""
+    limit: Int = 150
+    contentType: [ContentModuleType]
+  ): [ContentModule] @requires(fields: "tagUUID semanticID semanticType tagSlug userTags(tenant:bleacherReport) { uuid type followersCount(tenant:bleacherReport) } tagData {uuid type startTime endTime children {uuid type} parent {uuid slug}} interlacingInterval") @cacheControl(maxAge: 60, scope: PRIVATE)
+  contentsConnection(
+    """
+    A list of States to filter content modules by. Default value: PROGRAMMED
+    """
+    state: [ModuleState] = [PROGRAMMED]
+    """first"""
+    first: Int
+    """last"""
+    last: Int
+    """before"""
+    before: ContentCursor
+    """after"""
+    after: ContentCursor
+    """paginationControl"""
+    paginationControl: [PaginationControl]
+  ): ContentsConnection @requires(fields: "tagUUID semanticID semanticType tagSlug userTags(tenant:bleacherReport) { uuid type followersCount(tenant:bleacherReport) } tagData {uuid type startTime endTime children {uuid type} parent {uuid slug}}") @cacheControl(maxAge: 60, scope: PRIVATE)
+}
+
+type ChannelStreamMetaData @key(fields: "id") {
+  id: String
+  tagUUID: String @external
+  semanticID: SemanticID @external
+  contents(
+    """
+    A list of States to filter content modules by. Default value: PROGRAMMED
+    """
+    state: [ModuleState] = [PROGRAMMED]
+    """Limits the number of returned Content Modules."""
+    limit: Int
+    """Defined which type of content is returned."""
+    contentType: [ContentModuleType]
+  ): [ContentModule] @requires(fields: "tagUUID semanticID") @cacheControl(maxAge: 60, scope: PRIVATE)
+}
+
+enum ModuleState {
+  SCHEDULED
+  UNPROGRAMMED
+  PROGRAMMED
+}
+
+type ContentsConnection @cacheControl(maxAge: 10) {
+  edges: [ContentEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ContentEdge @cacheControl(maxAge: 10) {
+  cursor: ContentCursor!
+  node: ContentModule!
+}
+
+type PageInfo @shareable @cacheControl(maxAge: 10) {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type A2VResult @key(fields: "type contentID") {
+  video: StandaloneContentModule @override(from: "data-services-api")
+  type: ContentModuleType!
+  contentID: String!
+}
+
+type A2AResult @key(fields: "type contentID") {
+  article: StandaloneContentModule @override(from: "data-services-api")
+  type: ContentModuleType!
+  contentID: String!
+}
+
+type V2VResult @key(fields: "type contentID") {
+  video: StandaloneContentModule @override(from: "data-services-api")
+  type: ContentModuleType!
+  contentID: String!
+}
+
+type TrendingResult @key(fields: "type contentID") {
+  contentModule: StandaloneContentModule @override(from: "data-services-api")
+  type: ContentModuleType!
+  contentID: String!
+}
+
+type ModuleMetaData @key(fields: "hash") @cacheControl(inheritMaxAge: true) {
+  hash: String!
+  """
+  Represents the community this content module belongs to (ex. NFL, NBA, BR).
+  In other words, the chosen Tag/Channel we want to display, and often but
+  not always the destination the user would tap through to.
+  """
+  communityTag: TagV2
+  """
+  Represents author of the content within a Content Module. In most cases this would be Creators (creator tags).
+  """
+  author: TagV2
+  """Represents the contentId for video."""
+  videoContentId: String
+  """Represents the tenant."""
+  tenant: Tenant
+}
+
+type ContentBrand @key(fields: "source", resolvable: false) {
+  source: String!
+}
+
+union ProgrammedContent = Article | ExternalArticle | StatsBetting | StatsGamecast | Tweet | VideoV2 | UGCImagePoll | UGCPost | UGCTextPoll
+
+type Article @key(fields: "hash") {
+  hash: String!
+}
+
+type StatsBetting @key(fields: "id") {
+  id: ID!
+}
+
+type StatsGamecast @key(fields: "slug") {
+  slug: String!
+}
+
+type Tweet @key(fields: "id") {
+  id: ID!
+}
+
+type UGCTextPoll @key(fields: "id") {
+  id: ID!
+}
+
+type UGCPost @key(fields: "id") {
+  id: ID!
+}
+
+type UGCImagePoll @key(fields: "id") {
+  id: ID!
+}
+
+type VideoV2 @key(fields: "hash") {
+  hash: String @inaccessible
+}
+
+input PaginationControl {
+  semanticId: String!
+  first: Int
+  last: Int
+  before: ContentCursor
+  after: ContentCursor
+}
+
+type ContentMetadata {
+  video: VideoV2Metadata
+}
+
+type VideoV2Metadata {
+  state: VideoState
+}
+
+enum VideoState {
+  UPCOMING
+  LIVE
+  ENDED
+  VOD
+}
+
+type DeleteVideoContentModulesResult {
+  deletedCount: Int!
+  deletedModuleIds: [String!]!
+  contentId: String!
+}
+
+type ExternalArticle @key(fields: "id") {
+  id: ID!
+  url: String!
+  source: String!
+  providerName: String!
+  created: Date!
+}
+
+input TagComponent {
+  tagUUID: String!
+  semanticID: SemanticID!
+  position: Int
+  isPositionLocked: Boolean
+  positionLockExpiresAt: Date
+  isPinned: Boolean
+}
+
+input ContentModuleInput {
+  id: ID
+  contentId: ID!
+  lastModifiedBy: String!
+  channels: [TagComponent!]!
+  title: String!
+  description: String!
+  thumbnail: String!
+  contentType: ContentModuleType!
+  orientation: ModuleOrientation
+  expiresAt: Date
+  scheduledDate: Date
+  allowedCountries: [String]
+  commentsEnabled: Boolean
+  thumbnailAccreditation: String
+  thumbnailCopyright: String
+  updateProgrammingTimestamp: Boolean
+}
+
+input PackageInput {
+  contentModuleId: ID
+  lastModifiedBy: String!
+  channels: [TagComponent!]!
+  title: String!
+  contentType: ContentModuleType!
+  expiresAt: Date
+  description: String
+  packageType: PackageType
+  allowedCountries: [String]
+  commentsEnabled: Boolean
+  packageTag: String
+  scheduledDate: Date
+}
+
+input PackageContent {
+  contentId: ID
+  contentType: ContentModuleType
+  thumbnailAccreditation: String
+  thumbnailCopyright: String
+  title: String!
+  description: String!
+  thumbnail: String!
+  orientation: ModuleOrientation
+  allowedCountries: [String]
+  positionLockExpiresAt: Date
+  isPositionLocked: Boolean
+  position: Int
+  contentModuleId: ID
+  updateProgrammingTimestamp: Boolean
+  scheduledDate: Date
+}
+
+input VideoMetadataInput {
+  videoId: String!
+  newState: VideoState!
+}
+
+type Mutation {
+  createStandaloneContentModule(contentId: ID!, lastModifiedBy: String!, channels: [TagComponent!]!, title: String!, description: String!, thumbnail: String!, contentType: ContentModuleType!, orientation: ModuleOrientation, expiresAt: Date, scheduledDate: Date, allowedCountries: [String], commentsEnabled: Boolean, thumbnailAccreditation: String, thumbnailCopyright: String): StandaloneContentModule!
+  updateStandaloneContentModule(contentId: ID, lastModifiedBy: String, channels: [TagComponent], title: String, description: String, thumbnail: String, contentType: ContentModuleType, expiresAt: Date, scheduledDate: Date, id: ID!, isAlerted: Boolean, allowedCountries: [String], commentsEnabled: Boolean, thumbnailAccreditation: String, thumbnailCopyright: String, updateProgrammingTimestamp: Boolean): ContentModule!
+  createPackageContentModule(contentId: ID @deprecated(reason: "Not used field"), lastModifiedBy: String!, channels: [TagComponent!]!, packageType: PackageType, orientation: ModuleOrientation, title: String!, description: String, contentType: ContentModuleType!, expiresAt: Date, scheduledDate: Date, allowedCountries: [String], commentsEnabled: Boolean, packageTag: String): ContentModule!
+  updatePackageContentModule(lastModifiedBy: String, channels: [TagComponent], title: String, description: String, expiresAt: Date, scheduledDate: Date, contentModuleId: ID!, isAlerted: Boolean, allowedCountries: [String], commentsEnabled: Boolean, packageTag: String): ContentModule!
+  addContentToPackage(packageModuleId: String!, contentId: ID, contentType: ContentModuleType, position: Int!, title: String!, description: String!, thumbnail: String!, allowedCountries: [String], lastModifiedBy: String!, commentsEnabled: Boolean, contentModuleId: ID, thumbnailAccreditation: String, thumbnailCopyright: String, scheduledDate: Date): ContentModule!
+  deleteContentModule(id: ID!): String!
+  expireContentModules: [Int!]! @deprecated(reason: "use deleteContentModule instead")
+  upsertStandaloneContentModules(data: [ContentModuleInput!]!, delete: [ID!]): [ContentModule!]!
+  createExternalArticle(url: String!, source: String!, providerName: String!, created: Date): ExternalArticle!
+  createStaticPackages(packageTypes: [PackageType!]!, channels: [TagComponent!], lastModifiedBy: String!, contentType: ContentModuleType!, allowedCountries: [String], commentsEnabled: Boolean): [ContentModule]!
+  deleteContentFromPackage(packageContentModuleId: String!, contentModuleId: String!): Boolean
+  upsertPackageContentModules(contents: [PackageContent], packages: [PackageInput], delete: [ID!]): [PackageContentModule]
+  upsertVideoState(data: VideoMetadataInput!): VideoV2Metadata
+  deleteDuplicateScheduledHighlightsPackages: String
+  deleteContentModuleByContentId(contentId: String!, contentType: ContentModuleType): DeleteVideoContentModulesResult!
+}
+
+type Query {
+  contentModules: [ContentModule]
+  fetchContentModuleById(id: ID!): ContentModule @cacheControl(maxAge: 1)
+  fetchContentModuleByContentIdAndContentType(contentId: ID!, contentType: String!, state: [ModuleState] = [PROGRAMMED]): [ContentModule]! @cacheControl(maxAge: 1)
+  fetchPackageByTypeAndTag(packageType: String!, tagUUID: String!, state: [ModuleState] = [PROGRAMMED]): [PackageContentModule] @cacheControl(maxAge: 1)
+  findPackageByTitle(title: String, state: [ModuleState] = [PROGRAMMED]): [PackageContentModule]
+  findContentModulesBySemanticIdAndTag(tagUUID: String, semanticID: SemanticID, state: [ModuleState] = [PROGRAMMED], limit: Int = 150, tagSlug: String): [ContentModule] @cacheControl(maxAge: 1)
+  paginatedFindContentModulesBySemanticIdAndTag(
+    tagUUID: String
+    semanticID: SemanticID
+    first: Int
+    after: ContentCursor
+    last: Int
+    before: ContentCursor
+    """
+    A list of States to filter content modules by. Default value: PROGRAMMED
+    """
+    state: [ModuleState] = [PROGRAMMED]
+  ): ContentsConnection @deprecated(reason: "This query will soon be removed in favor of paginated version of findContentModulesBySemanticIdAndTag")
+  fetchScheduledModules(startDate: Date, endDate: Date, limit: Int): [ContentModule]
+}
+
+type UserDestination @key(fields: "contentModuleId") {
+  contentModuleId: ID!
+  contentModule: StandaloneContentModule @requires(fields: "contentModuleId")
+}
+
+scalar _Any
+
+scalar _FieldSet
+
+scalar Date
+
+scalar MongoID
+
+"""
+The `ContentCursor` scalar type is a base64 encoded string
+that represents an opaque and unique identifier for Content Modules within a ChannelComponent.
+"""
+scalar ContentCursor
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+enum Actions {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+enum ChannelType {
+  League
+  SmallTeam
+  PopularTeam
+  Interest
+  GameCast
+  Home
+  Following
+  FollowingAddTags
+  Alerts
+  Discovery
+  Creator
+  User
+  Onboarding
+  OnboardingAddTags
+  Scores
+}
+
+enum CreatorTier {
+  Platinum
+  Gold
+  Silver
+  Bronze
+}
+
+enum SemanticID {
+  StatsGamecast
+  StatsScoreboard
+  StatsScorecard
+  StatsBetting
+  StatsVenue
+  StatsInjuryReport
+  StatsLiveOdds
+  StatsSeasonPerformance
+  StatsLeagueRankings
+  StatsGameInfo
+  StatsPreviousMeetings
+  StatsLineScore
+  StatsPlayPreview
+  StatsPlaySummary
+  StatsMatchTimeline
+  StatsDriveChart
+  StatsBaseball
+  StatsPlays
+  StatsGameStats
+  StatsTeamComparison
+  StatsOdds
+  StatsSeasonLeaders
+  StatsPlayersOnIce
+  StatsHockeyGameState
+  StatsPitchingInfo
+  StatsLineup
+  StatsSubstitutions
+  StatsStandings
+  StatsScores
+  StatsSchedule
+  StatsMoneyline
+  StatsTotalPoints
+  StatsSpread
+  StatsScoringPlays
+  StatsDrawNoBet
+  Header
+  UserHeader
+  SearchBar
+  Chat
+  ExternalLink
+  TrendingClips
+  Ads
+  TagFollowing
+  TagRecommended
+  TagOnboarding
+  TagSearch
+  ContentPremiumVideo
+  ContentSocialFeed
+  ContentCommunityFeed
+  ContentHighlights
+  ContentFullGameHighlights
+  ContentChannelFeed
+  ContentWhatsBuzzing
+  ContentTopHeadlines
+  ContentTrendingVideos
+  UgcFromTheFans
+  UgcFeed
+  UgcPosts
+  UgcComments
+  Dummy
+  AlertFollowingFeed
+  AlertActivitiesFeed
+  LiveAndUpcoming
+  LiveNow
+  LiveUpcoming
+  ContentHomeLandscape
+  ContentHomePortraitCollection
+  ContentHomeHeadlines
+  ContentHomeCommunityCollections
+  ContentShortGameHighlights
+  ContentTrendingBets
+  RecForYou
+  RecYouMightLike
+  RecCreatorsInYourCommunities
+  RecMostFollowedTeams
+  RecMostFollowedLeagues
+  RecTopInterests
+  RecTopCreators
+  RecRelatedCommunities
+  StatsPlayerStats
+  StatsScoresStrip
+  StatsThreeWayMoneyline
+  StatsHeadToHead
+  StatsPlayerProp
+  StatsPodium
+  StatsPodiumEntry
+  StatsRaceInfo
+  AffiliateWatchBanner
+}
+
+enum SemanticType {
+  AdsData
+  ContentModuleData
+  StatsData
+  SocialData
+  StatsPlaceholder
+  TagData
+  UserData
+  AlertData
+  Default
+  RecommendationData
+}
+
+enum Tenant {
+  aewGame
+  bleacherReport
+  estadioArgentina
+  estadioBrazil
+  estadioChile
+  ncaa
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+}

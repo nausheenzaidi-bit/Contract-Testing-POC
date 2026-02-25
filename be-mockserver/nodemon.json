@@ -1,0 +1,8 @@
+{
+  "watch": [
+    "custom-mock-server.cjs",
+    "custom-mock-scenarios.json"
+  ],
+  "ext": "cjs,json",
+  "exec": "node custom-mock-server.cjs"
+}

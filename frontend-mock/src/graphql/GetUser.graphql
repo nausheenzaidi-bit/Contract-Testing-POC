@@ -1,0 +1,18 @@
+query GetUser($tenant: Tenant!) {
+  getUser(tenant: $tenant) {
+    id
+    profileId
+    settings {
+      spoilers_enabled
+      alerts {
+        type
+        enabled
+      }
+      social {
+        type
+        enabled
+      }
+    }
+  }
+}
+

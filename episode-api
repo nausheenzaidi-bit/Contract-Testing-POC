@@ -1,0 +1,104 @@
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @external on FIELD_DEFINITION
+
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+
+directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
+
+directive @key(fields: _FieldSet!, resolvable: Boolean = true) on OBJECT | INTERFACE
+
+directive @extends on OBJECT
+
+directive @tag(name: String!) repeatable on FIELD_DEFINITION | OBJECT | INTERFACE | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+type Content
+  @key(fields: "hash")
+  @cacheControl(maxAge: 240)
+{
+  hash: String
+  episodes: [Show]
+}
+
+enum Feeds {
+  CDFH_CL
+  TNTSPO_AR
+}
+
+type Feed
+  @cacheControl(maxAge: 240)
+{
+  code: String
+  link: String
+  logo: String
+  description: String
+  shows: [Show]
+}
+
+type Query
+  @cacheControl(maxAge: 240)
+{
+  """getScheduleByFeeds | Episode API | EPG API"""
+  getScheduleByFeeds(feed: Feeds!, from: String, to: String, count: Int): Schedule
+  _entities(representations: [_Any!]!): [_Entity]!
+  _service: _Service!
+}
+
+type Schedule
+  @cacheControl(maxAge: 240)
+{
+  dateFrom: String
+  dateTo: String
+  offset: String
+  feeds: [Feed]
+}
+
+type Show
+  @key(fields: "hash")
+  @cacheControl(maxAge: 240)
+{
+  id: String
+  titleId: String
+  title: String
+  originalTitle: String
+  genreList: String
+  highlightList: String
+  airDateTime: String
+  lang: String
+  begin: String
+  end: String
+  rate: String
+  serie: String
+  season: String
+  episode: String
+  storyline: String
+  offset: String
+  franchiseName: String
+  franchiseId: String
+  ratingArgentina: String
+  ratingBrasil: String
+  ratingMexico: String
+  length: String
+  summary: String
+  hash: String
+
+  """
+  Status Values (derived from "begin", "end" and "offset" values): "estimated" (before)  || "current" (during)  || "actual" (after)
+  """
+  status: String
+}
+
+scalar _Any
+
+scalar _FieldSet
+
+type _Service {
+  sdl: String
+}
+
+union _Entity = Content | Show

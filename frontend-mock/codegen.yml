@@ -1,0 +1,15 @@
+schema: ./schema.graphql
+documents: src/graphql/**/*.{graphql,gql}
+ignoreNoDocuments: true
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typed-document-node
+      - typescript-resolvers
+    config:
+      useIndexSignature: true
+      maybeValue: "T | null"
+      contextType: "any"
+

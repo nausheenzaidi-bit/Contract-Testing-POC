@@ -1,0 +1,408 @@
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+scalar Date
+
+type AdsAdSize @cacheControl(inheritMaxAge: true) {
+  width: Int
+  height: Int
+}
+
+type AdsHistory @cacheControl(inheritMaxAge: true) {
+  modifiedBy: String
+  modifiedOn: Float
+  area: String
+  oldValue: String
+  newValue: String
+}
+
+type AdsSlot @cacheControl(inheritMaxAge: true) {
+  name: String
+  adSizes: [AdsAdSize]
+  targetings: [AdsTargeting]
+  adUnitPath: String
+  isResponsive: Boolean
+  hasInViewRefresh: Boolean
+  isFluid: Boolean
+  isInheritAdUnitFromRegistry: Boolean
+  safeFrameAllowOverlayExpansion: Boolean
+  safeFrameAllowPushExpansion: Boolean
+  safeFrameConfig: Boolean
+  safeFrameSandboxMode: Boolean
+  inViewRefreshCount: Int
+  inViewRefreshInterval: Int
+  viewports: [AdsViewport]
+}
+
+type AdsTargeting @cacheControl(inheritMaxAge: true) {
+  key: String
+  value: String
+}
+
+type AdsRegistryDetailItem @cacheControl(inheritMaxAge: true) {
+  name: String
+  description: String
+  lastDeployedOn: Date
+  nameLowered: String
+  slots: [String]
+  adUnitPath: String
+  error: String
+}
+
+type AdsDeployedState @key(fields: "name") @cacheControl(inheritMaxAge: true) {
+  error: String
+  hasInViewRefresh: Boolean
+  hasRealTimeAdInsertion: Boolean
+  inViewRefreshCount: Int
+  inViewRefreshInterval: Int
+  isSingleton: Boolean
+  name: String
+  rtaiBuffer: Int
+  rtaiInitialPlacement: Int
+  rtaiMaxNoOfAds: Int
+  rtaiOffset: Int
+  rtaiParentSelector: String
+  safeFrameOverlayExpansion: Boolean
+  safeFrameAllowPushExpansion: Boolean
+  safeFrameConfig: Boolean
+  safeFrameSandboxMode: Boolean
+  slots: [AdsSlot]
+  tagForChildDirectedTreatment: Boolean
+  targetings: [AdsTargeting]
+  template: String
+}
+
+"""
+AdsChannelConfiguration | Ads API
+----------------------------------------------
+Provides the ad registry and configuration for the Channel entity. This includes a registry for the
+top-level view, as well as each section or grouping for the channel.
+"""
+type AdsChannelConfiguration @cacheControl(inheritMaxAge: true) {
+  adUnitPath: String!
+  registry: AdsDeployedState!
+  configuration: AdsModuleConfiguration
+  groupings: [AdsChannelGroupingConfiguration]
+}
+
+"""
+AdsChannelGroupingConfiguration | Ads API
+----------------------------------------------
+A mapping of ad slot registries for each grouping in a Channel. The id property maps to an id of
+each of the groupings for the channel.
+"""
+type AdsChannelGroupingConfiguration @cacheControl(inheritMaxAge: true) {
+  id: String!
+  adUnitPath: String!
+  registry: AdsDeployedState!
+}
+
+"""
+ AdsConfiguration | Ads API
+ ----------------------------------------------
+Configuration related to serving ads. Provides the ad slot registry as well as the configuration
+for the web ad library, AdFuel.
+"""
+type AdsConfiguration @cacheControl(inheritMaxAge: true) {
+  adUnitPath: String!
+  registry: AdsDeployedState!
+  configuration: AdsModuleConfiguration
+}
+
+"""
+AdsModuleConfiguration | Ads API
+----------------------------------------------
+Provides an ad configuration JSON blob that can be parsed and passed to AdFuel when content is
+rendered in a web view or in a web browser.
+"""
+type AdsModuleConfiguration @cacheControl(inheritMaxAge: true) {
+  "Configuration for AdFuel in strigified JSON"
+  jsonBlob: String!
+}
+
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@external", "@requires", "@shareable", "@inaccessible"]) {
+  mutation: Mutation
+}
+
+extend type Article @key(fields: "uuid") @cacheControl(maxAge: 86400, scope: "PUBLIC") {
+  uuid: String!
+  primaryTag: TagV2! @external
+  tenant: String @external
+  contentType: String! @external
+  "Ads Configuration | Ads API"
+  adsConfig: AdsConfiguration @requires(fields: """
+  tenant
+  contentType
+  primaryTag {
+  	type
+  	slug
+  	root {
+  		type
+  		slug
+  	}
+  	parent {
+  		type
+  		slug
+  		parent {
+  			type
+  			slug
+  			parent {
+  				type
+  				slug
+  				parent {
+  					type
+  					slug
+  				}
+  			}
+  		}
+  	}
+  }
+  """)
+}
+
+extend type Channel @key(fields: "uuid") @cacheControl(maxAge: 86400, scope: "PUBLIC") {
+  uuid: String!
+  tag: TagV2! @external
+  tenant: String @external
+  type: ChannelType @external
+  groupingList: [GroupingHeader] @external
+  "Ads Channel Configuration | Ads API"
+  adsConfig: AdsChannelConfiguration @requires(fields: """
+  tenant
+  type
+  groupingList {
+    id
+    title
+    isDefault
+    applicableGameStates
+  }
+  tag {
+    type
+    slug
+    root {
+      type
+      slug
+    }
+    parent {
+      type
+      slug
+      parent {
+        type
+        slug
+        parent {
+          type
+          slug
+          parent {
+            type
+            slug
+          }
+        }
+      }
+    }
+  }
+  """)
+}
+
+enum ChannelType {
+  League
+  SmallTeam
+  PopularTeam
+  Interest
+  GameCast
+  Home
+  Following
+  FollowingAddTags
+  Alerts
+  Discovery
+  Creator
+  User
+  Onboarding
+  OnboardingAddTags
+  Scores
+}
+
+"""The Brand or Source for content. Primarily for External Articles"""
+type ContentBrand @key(fields: "source", resolvable: false) {
+  source: String!
+  tenant: String @external
+}
+
+enum ContentModuleType {
+  Article
+  ExternalArticle
+  StatsBetting
+  StatsGamecast
+  Tweet
+  UGCImagePoll
+  UGCTextPoll
+  UGCPost
+  VideoV2
+  Mixed
+}
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+enum GameState {
+  PreGame
+  LiveGame
+  PostGame
+  Standard
+}
+
+type GroupingHeader {
+  id: String @external
+  title: String @external
+  isDefault: Boolean @external
+  applicableGameStates: [GameState] @external
+}
+
+type ModuleMetaData @key(fields: "hash", resolvable: false) {
+  hash: String!
+  brand: ContentBrand @external
+  """
+  Represents the community this content module belongs to (ex. NFL, NBA, BR).
+  In other words, the chosen Tag/Channel we want to display, and often but
+  not always the destination the user would tap through to.
+  """
+  communityTag: TagV2 @external
+}
+
+scalar MongoID
+
+type Mutation {
+  """
+  flushAdRegistryCache | Ads API
+  ----------------------------------------------
+  Flushes the cache for ads registries and metadata based on the operationName
+  Returns the number of entries deleted
+  """
+  flushAdRegistryCache(operationName: String!): Int
+  """
+  flushAdSiteCache | Ads API
+  ----------------------------------------------
+  Flushes the cache for ads site configurations
+  Returns the number of entries deleted
+  """
+  flushAdSiteCache(siteCache: String): Boolean
+}
+
+extend type PackageContentModule @key(fields: "id") @cacheControl(maxAge: 86400, scope: "PUBLIC") {
+  id: ID!
+  metaData: ModuleMetaData @external
+  "Ads Configuration | Ads API"
+  adsConfig: AdsConfiguration @requires(fields: """
+  metaData {
+  	brand {
+  		tenant
+  	}
+  	communityTag {
+  		type
+  		slug
+  		root {
+  			slug
+  			type
+  		}
+  		parent {
+  			type
+  			slug
+  			parent {
+  				type
+  				slug
+  				parent {
+  					type
+  					slug
+  					parent {
+  						type
+  						slug
+  					}
+  				}
+  			}
+  		}
+  	}
+  }
+  """)
+}
+
+extend type Page @key(fields: "_id") @cacheControl(maxAge: 86400, scope: "PUBLIC") {
+  _id: MongoID!
+  uuid: String! @external
+  tenant: String @external
+  "Ads Configuration | Ads API"
+  adsConfig: AdsConfiguration @requires(fields: """
+  uuid
+  tenant
+  """)
+}
+
+extend type StandaloneContentModule @key(fields: "type contentID") @cacheControl(maxAge: 86400, scope: "PUBLIC") {
+  type: ContentModuleType!
+  contentID: String
+  metaData: ModuleMetaData @external
+  "Ads Configuration | Ads API"
+  adsConfig: AdsConfiguration @requires(fields: """
+  metaData {
+  	brand {
+  		tenant
+  	}
+  	communityTag {
+  		type
+  		slug
+  		root {
+  			slug
+  			type
+  		}
+  		parent {
+  			type
+  			slug
+  			parent {
+  				type
+  				slug
+  				parent {
+  					type
+  					slug
+  					parent {
+  						type
+  						slug
+  					}
+  				}
+  			}
+  		}
+  	}
+  }
+  """)
+}
+
+enum TagTypeV2 {
+  Conference
+  Creator
+  Division
+  Editor
+  Editorial
+  Event
+  GameCast
+  Interest
+  League
+  Page
+  Player
+  Person
+  Sport
+  Team
+}
+
+type TagV2 @key(fields: "hash", resolvable: false) {
+  hash: String! @inaccessible
+  slug: String! @external
+  type: TagTypeV2 @external
+  parent: TagV2 @external
+  root: TagV2 @external
+}
+
+type AdsViewport @cacheControl(inheritMaxAge: true) {
+  name: String
+  width: Int!
+  height: Int!
+  fluid: Boolean
+  sizes: [String]
+}

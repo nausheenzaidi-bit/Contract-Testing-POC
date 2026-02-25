@@ -1,0 +1,346 @@
+directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+scalar _FieldSet
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
+}
+
+scalar Date
+
+type Channel @key(fields: "uuid") {
+  uuid: String!
+}
+
+type Article @key(fields: "hash") {
+  hash: String!
+  tags: [TagV2] @external
+  primaryTag: TagV2! @external
+  """
+  trendingRank | Data Services API
+  
+  Returns the Trending Rank from [1,100]. Returns null if not trending.
+  """
+  trendingRank: Int @requires(fields: "hash")
+  recommendedVideos(countryCode: String, version: Int = 0, aspectRatio: AspectRatio = Any, limit: Int = 10): [A2VResult!]! @requires(fields: "hash tags { uuid type } primaryTag { uuid type }")
+  recommendedArticles(version: Int = 0, limit: Int = 10): [A2AResult!]! @requires(fields: "hash tags { uuid type } primaryTag { uuid type }")
+}
+
+type VideoV2 @key(fields: "hash") {
+  hash: String!
+  tags: [TagV2] @external
+  """
+  trendingRank | Data Services API
+  
+  Returns the Trending Rank from [1,100]. Returns null if not trending.
+  """
+  trendingRank: Int @requires(fields: "hash")
+  recommendedVideos(countryCode: String, version: Int = 0, aspectRatio: AspectRatio = Any, limit: Int = 10): [V2VResult!]! @requires(fields: "hash tags { uuid type }")
+}
+
+type TagV2 @key(fields: "hash") {
+  hash: String!
+  uuid: String! @external
+  type: TagTypeV2 @external
+  recommendedTags(type: TagTypeV2, limit: Int = 10): [ChannelRecommenderResult!]! @requires(fields: "hash")
+  recommendedArticles(limit: Int = 10): [DsContentModelResult!]! @requires(fields: "hash")
+}
+
+enum TagTypeV2 {
+  Conference
+  Creator
+  Division
+  Editor
+  Editorial
+  Event
+  GameCast
+  Interest
+  League
+  Page
+  Player
+  Person
+  Sport
+  Team
+}
+
+type ChannelComponent @key(fields: "uuid") {
+  uuid: String!
+  semanticID: SemanticID @external
+  tagUUID: String @external
+  """
+  dataServicesTagData | Data Services API
+  
+  Returns TagV2s according to the feature logic demanded by the given semanticID using data services.
+  """
+  dataServicesTagData(limit: Int = 10): [TagV2!]! @requires(fields: "semanticID tagUUID")
+}
+
+type StandaloneContentModule @key(fields: "type contentID") {
+  type: ContentModuleType!
+  contentID: String
+  id: ID! @external
+  alertRanks(limit: Int = 10): [AlertRank]!
+}
+
+type PackageContentModule @key(fields: "id") {
+  id: ID! @external
+  alertRanks(limit: Int = 10): [AlertRank]!
+}
+
+enum ContentModuleType {
+  Article
+  ExternalArticle
+  StatsBetting
+  StatsGamecast
+  Tweet
+  UGCImagePoll
+  UGCTextPoll
+  UGCPost
+  VideoV2
+  Mixed
+}
+
+enum AspectRatio {
+  Horizontal
+  Vertical
+  Any
+}
+
+interface DsContentModelResult @key(fields: "type contentID") {
+  type: ContentModuleType!
+  contentID: String!
+}
+
+type TrendingResult implements DsContentModelResult {
+  type: ContentModuleType!
+  contentID: String!
+  rank: Int!
+}
+
+type A2VResult implements DsContentModelResult {
+  type: ContentModuleType!
+  contentID: String!
+  score: Float!
+}
+
+type A2AResult implements DsContentModelResult {
+  type: ContentModuleType!
+  contentID: String!
+  score: Float!
+}
+
+type V2VResult implements DsContentModelResult {
+  type: ContentModuleType!
+  contentID: String!
+  score: Float!
+}
+
+type TrendingChannelResult {
+  tagV2: TagV2!
+  rank: Int!
+}
+
+type User @key(fields: "profileId") {
+  profileId: String
+  recommendedTeams: [TrendingChannelResult!] @requires(fields: "profileId")
+  recommendedLeagues: [TrendingChannelResult!] @requires(fields: "profileId")
+  recommendedVideos: [TrendingResult!] @requires(fields: "profileId")
+  recommendedArticles: [TrendingResult!] @requires(fields: "profileId")
+}
+
+type BlockedContent {
+  type: ContentModuleType!
+  contentID: String!
+  insertedAt: Date!
+}
+
+"""
+ChannelRecommenderResult | Data Services API
+Encapsulates all data related to the BR Channel Recommender Data Science Model.
+"""
+type ChannelRecommenderResult {
+  tagV2: TagV2!
+  score: Float!
+}
+
+type PushNotification @key(fields: "id") {
+  id: ID!
+}
+
+type AlertRank @key(fields: "rank") {
+  rank: Int!
+  pushNotification: PushNotification!
+}
+
+type DsModel {
+  name: String!
+  defaultVersion: Int!
+}
+
+type Query @cacheControl(maxAge: 60) {
+  dsModel(model: String!): DsModel
+  trendingChannels(topN: Int!): [TrendingChannelResult!]!
+  trendingArticles(topN: Int!, primaryPrioritizedTag: String = null, secondaryPrioritizedTags: [String!]! = []): [TrendingResult!]!
+  trendingVideos(topN: Int!, countryCode: String, aspectRatio: AspectRatio = Any, primaryPrioritizedTag: String = null, secondaryPrioritizedTags: [String!]! = []): [TrendingResult!]!
+  a2v(articleUuid: String!, countryCode: String, version: Int = 0, aspectRatio: AspectRatio = Any, limit: Int = 10, primaryPrioritizedTag: String = null, secondaryPrioritizedTags: [String!]! = []): [A2VResult!]!
+  a2a(articleUuid: String!, version: Int = 0, limit: Int = 10, primaryPrioritizedTag: String = null, secondaryPrioritizedTags: [String!]! = []): [A2AResult!]!
+  v2v(videoEventId: String!, countryCode: String, version: Int = 0, aspectRatio: AspectRatio = Any, limit: Int = 10, primaryPrioritizedTag: String = null, secondaryPrioritizedTags: [String!]! = []): [V2VResult!]!
+  articleBlocklist(sinceDate: Date, beforeDate: Date, limit: Int = 10): [BlockedContent!]!
+  videoBlocklist(sinceDate: Date, beforeDate: Date, limit: Int = 10): [BlockedContent!]!
+  alertRanks(limit: Int = 10, offset: Int = 0): [AlertRank!]!
+}
+
+enum Actions {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+enum ChannelType {
+  League
+  SmallTeam
+  PopularTeam
+  Interest
+  GameCast
+  Home
+  Following
+  FollowingAddTags
+  Alerts
+  Discovery
+  Creator
+  User
+  Onboarding
+  OnboardingAddTags
+  Scores
+}
+
+enum CreatorTier {
+  Platinum
+  Gold
+  Silver
+  Bronze
+}
+
+enum SemanticID {
+  StatsGamecast
+  StatsScoreboard
+  StatsScorecard
+  StatsBetting
+  StatsVenue
+  StatsInjuryReport
+  StatsLiveOdds
+  StatsSeasonPerformance
+  StatsLeagueRankings
+  StatsGameInfo
+  StatsPreviousMeetings
+  StatsLineScore
+  StatsPlayPreview
+  StatsPlaySummary
+  StatsMatchTimeline
+  StatsDriveChart
+  StatsBaseball
+  StatsPlays
+  StatsGameStats
+  StatsTeamComparison
+  StatsOdds
+  StatsSeasonLeaders
+  StatsPlayersOnIce
+  StatsHockeyGameState
+  StatsPitchingInfo
+  StatsLineup
+  StatsSubstitutions
+  StatsStandings
+  StatsScores
+  StatsSchedule
+  StatsMoneyline
+  StatsTotalPoints
+  StatsSpread
+  StatsScoringPlays
+  StatsDrawNoBet
+  Header
+  UserHeader
+  SearchBar
+  Chat
+  ExternalLink
+  TrendingClips
+  Ads
+  TagFollowing
+  TagRecommended
+  TagOnboarding
+  TagSearch
+  ContentPremiumVideo
+  ContentSocialFeed
+  ContentCommunityFeed
+  ContentHighlights
+  ContentFullGameHighlights
+  ContentChannelFeed
+  ContentWhatsBuzzing
+  ContentTopHeadlines
+  ContentTrendingVideos
+  UgcFromTheFans
+  UgcFeed
+  UgcPosts
+  UgcComments
+  Dummy
+  AlertFollowingFeed
+  AlertActivitiesFeed
+  LiveAndUpcoming
+  LiveNow
+  LiveUpcoming
+  ContentHomeLandscape
+  ContentHomePortraitCollection
+  ContentHomeHeadlines
+  ContentHomeCommunityCollections
+  ContentShortGameHighlights
+  ContentTrendingBets
+  RecForYou
+  RecYouMightLike
+  RecCreatorsInYourCommunities
+  RecMostFollowedTeams
+  RecMostFollowedLeagues
+  RecTopInterests
+  RecTopCreators
+  RecRelatedCommunities
+  StatsPlayerStats
+  StatsScoresStrip
+  StatsThreeWayMoneyline
+  StatsHeadToHead
+  StatsPlayerProp
+  StatsPodium
+  StatsPodiumEntry
+  StatsRaceInfo
+  AffiliateWatchBanner
+}
+
+enum SemanticType {
+  AdsData
+  ContentModuleData
+  StatsData
+  SocialData
+  StatsPlaceholder
+  TagData
+  UserData
+  AlertData
+  Default
+  RecommendationData
+}
+
+enum Tenant {
+  aewGame
+  bleacherReport
+  estadioArgentina
+  estadioBrazil
+  estadioChile
+  ncaa
+}
+
+schema {
+  query: Query
+}
