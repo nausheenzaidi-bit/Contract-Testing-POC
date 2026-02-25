@@ -1,0 +1,196 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: RUST_PROD_WMSPORTS_APIS
+meta:
+  id: wrk_88cf7ce5485e442eafcade3f4a048fb1
+  created: 1768984641225
+  modified: 1768984641225
+  description: ""
+collection:
+  - name: HS_RUST_PROD_WM_SPORTS
+    meta:
+      id: fld_79814ab356fd43c8941e2da1c6e42178
+      created: 1768984677918
+      modified: 1768984677918
+      sortKey: -1000000000
+      description: ""
+    children:
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/up/elb
+        name: Health Check
+        meta:
+          id: req_26f55201f0434e79a59760860c08ebae
+          created: 1768984677918
+          modified: 1768984677918
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849167
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/client/stream_config/los-angeles-lakers
+        name: Stream Configuration
+        meta:
+          id: req_65b56591a6f8426dad84102e29355086
+          created: 1768984677919
+          modified: 1768984677919
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849117
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/client/tweets
+        name: Get Tweets
+        meta:
+          id: req_116814a7ef8746e9ab8180e019ee2be7
+          created: 1768984677920
+          modified: 1768984677920
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849079.5
+        method: GET
+        parameters:
+          - name: ids
+            value: 2013872487910514691,2013870435138494758
+            description: ""
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/client/hydrate
+        name: Hydrate Tweets with URL
+        meta:
+          id: req_8dc1d0b4ba854e578ac96bcda3817556
+          created: 1768984677920
+          modified: 1768984677920
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849085.75
+        method: GET
+        parameters:
+          - name: url
+            value: https://x.com/NBA/status/2013836436739379373
+            description: ""
+            disabled: false
+        headers:
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/client/stream_config/los-angeles-lakers
+        name: RSS Toggle
+        meta:
+          id: req_c0d313fc85554e178b8f6d9bad38f804
+          created: 1768984677920
+          modified: 1768984677920
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849092
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                    	"rss_output_toggle": true,
+                    		"programmer_override": true
+
+                    }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://sports-hydration-station.us-east-1.sportsplatform.io/client/tweets
+        name: Create Tweets
+        meta:
+          id: req_c24e679a6db946f0b5ff11995c37df54
+          created: 1768984677920
+          modified: 1768984677920
+          isPrivate: false
+          description: ""
+          sortKey: -1768983849067
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                    	"id": "2013869140264554876"
+                    }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.3.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_6ccb7111e18f29c56187bae474f8726cba405244
+    created: 1768984641228
+    modified: 1768984641228
+environments:
+  name: Base Environment
+  meta:
+    id: env_6ccb7111e18f29c56187bae474f8726cba405244
+    created: 1768984641227
+    modified: 1768984641227
+    isPrivate: false

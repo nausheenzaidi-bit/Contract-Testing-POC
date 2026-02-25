@@ -1,0 +1,167 @@
+{
+  "kafka_contracts": {
+    "1_socialmedia_tweet": {
+      "description": "Hydration Station publishes tweets to BMM for indexing",
+      "provider": "sports-hydration-station-go",
+      "consumer": "bmm-service",
+      "topic": "bmm.socialmedia.v4",
+      "message_schema": {
+        "entity_class": 46,
+        "id": {
+          "id": "1672589658990026755",
+          "namespace": "urn:wbd:identifier:hydration-station:socialmedia-id"
+        },
+        "text": "The Celtics win the championship!",
+        "author_id": "123456789",
+        "external_url": "https://twitter.com/celtics/status/1672589658990026755",
+        "created_date_time": "2024-11-10T22:00:00Z",
+        "last_modified_date_time": "2024-11-10T22:00:00Z",
+        "hashtags": [
+          {"text": "Celtics"},
+          {"text": "NBA"}
+        ],
+        "tweet": {
+          "tweet_type": 1,
+          "tweet_author": {
+            "username": "celtics",
+            "name": "Boston Celtics",
+            "verified": true,
+            "profile_image_url": "https://pbs.twimg.com/profile_images/..."
+          }
+        }
+      },
+      "pact_rules": {
+        "entity_class": {"match": "integer", "value": 46},
+        "id.namespace": {"match": "regex", "regex": "^urn:wbd:identifier:"},
+        "text": {"match": "type"},
+        "created_date_time": {"match": "iso8601"}
+      }
+    },
+    "2_contentcommand": {
+      "description": "Hydration Station tells BMM to create Content Module with tags",
+      "provider": "sports-hydration-station-go",
+      "consumer": "bmm-service",
+      "topic": "bmm.contentcommand.v4",
+      "message_schema": {
+        "command_type": 1,
+        "commanded_entity_class": 46,
+        "content_id": {
+          "id": "1672589658990026755",
+          "namespace": "urn:wbd:identifier:hydration-station:socialmedia-id"
+        },
+        "entity_class": 49,
+        "id": {
+          "id": "boston-celtics_1672589658990026755",
+          "namespace": "urn:wbd:identifier:hydration-station:contentcommand-id"
+        },
+        "taxonomy_reference_groups": [
+          {
+            "kind": "Team",
+            "taxonomy_references": [
+              {
+                "taxonomy_id": {
+                  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                  "namespace": "urn:wbd:identifier:sp-cms:taxonomy-id"
+                }
+              }
+            ]
+          }
+        ],
+        "created_date_time": "2024-11-10T22:00:00Z",
+        "last_modified_date_time": "2024-11-10T22:00:00Z"
+      },
+      "pact_rules": {
+        "command_type": {"match": "integer", "value": 1},
+        "entity_class": {"match": "integer", "value": 49},
+        "commanded_entity_class": {"match": "integer", "oneOf": [46, 47]},
+        "taxonomy_reference_groups[*].taxonomy_references[*].taxonomy_id.id": {"match": "regex", "regex": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"}
+      }
+    },
+    "3_socialmedia_article": {
+      "description": "Hydration Station publishes RSS articles to BMM",
+      "provider": "sports-hydration-station-go",
+      "consumer": "bmm-service",
+      "topic": "bmm.socialmedia.v4",
+      "message_schema": {
+        "entity_class": 47,
+        "id": {
+          "id": "aHR0cHM6Ly9leGFtcGxlLmNvbS9hcnRpY2xl",
+          "namespace": "urn:wbd:identifier:hydration-station:socialmedia-id"
+        },
+        "text": "Breaking: Major trade announcement",
+        "author_id": "rss-feed-espn",
+        "external_url": "https://example.com/article",
+        "created_date_time": "2024-11-10T22:00:00Z",
+        "last_modified_date_time": "2024-11-10T22:00:00Z",
+        "external_article": {
+          "headline": "Breaking: Major trade announcement",
+          "host_site": "example.com"
+        }
+      },
+      "pact_rules": {
+        "entity_class": {"match": "integer", "value": 47},
+        "id.id": {"match": "regex", "regex": "^[A-Za-z0-9_-]+$"},
+        "external_article.host_site": {"match": "type"}
+      }
+    },
+    "4_talkwalker_event_consumer": {
+      "description": "Hydration Station consumes social media events from Talkwalker",
+      "provider": "talkwalker-api",
+      "consumer": "sports-hydration-station-go",
+      "topic": "talkwalker.social.events",
+      "message_schema": {
+        "id": "tw_12345678",
+        "type": "tweet",
+        "url": "https://twitter.com/user/status/1672589658990026755",
+        "text": "Breaking news about the game!",
+        "author": {
+          "name": "Sports Reporter",
+          "handle": "@sportsreporter"
+        },
+        "published_at": "2024-11-10T22:00:00Z",
+        "engagement": {
+          "likes": 1234,
+          "retweets": 567
+        }
+      },
+      "pact_rules": {
+        "type": {"match": "regex", "regex": "^(tweet|article|post)$"},
+        "url": {"match": "regex", "regex": "^https?://"},
+        "published_at": {"match": "iso8601"}
+      }
+    }
+  },
+  "constants": {
+    "entity_classes": {
+      "SocialMediaTweet": 46,
+      "SocialMediaExternalArticle": 47,
+      "ContentCommand": 49
+    },
+    "command_types": {
+      "Create": 1
+    },
+    "tweet_types": {
+      "Original": 1,
+      "Reply": 2,
+      "Quote": 3,
+      "Retweet": 4
+    },
+    "namespaces": {
+      "socialmedia_id": "urn:wbd:identifier:hydration-station:socialmedia-id",
+      "contentcommand_id": "urn:wbd:identifier:hydration-station:contentcommand-id",
+      "taxonomy_id": "urn:wbd:identifier:sp-cms:taxonomy-id"
+    }
+  },
+  "documentation": {
+    "bmm_api_docs": "https://github.com/wbd-streaming/global-communication-schema",
+    "hydration_station_repo": "https://github.com/warnermediacode/sports-hydration-station-go",
+    "message_flow": "Hydration Station (Producer) → Kafka → BMM Service (Consumer) → Content Discovery",
+    "notes": [
+      "For each piece of content, Hydration Station sends TWO messages:",
+      "1. SocialMedia message (entity_class 46 for tweets, 47 for articles) - raw data for indexing",
+      "2. ContentCommand message (entity_class 49) - instruction to create Content Module with taxonomy tags",
+      "The ContentCommand references the SocialMedia content via content_id field",
+      "All messages use URN-based namespaces for proper routing on the message bus"
+    ]
+  }
+}
