@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="StatsAPI Contract Tests" tests="3" failures="0" skipped="0" time="0.034">
+  <testsuite name="StatsAPI Contract Tests" tests="3" failures="0" skipped="0" time="0.034" timestamp="2026-02-26T09:48:26.899Z">
+    <testcase name="getGamecastBySlug — success" classname="graphql" time="0.021">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ Field "getGamecastBySlug.slug" present
+✓ Field "getGamecastBySlug.status" present
+✓ No GraphQL errors
+✓ Response time 20ms <= 5000ms
+]]></system-out>
+    </testcase>
+    <testcase name="getScores — returns array" classname="graphql" time="0.010">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="REST healthcheck" classname="rest" time="0.003">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ Field "status" present
+]]></system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,9 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pact-primary: #00d9c0;
+  --color-pact-secondary: #5f5fff;
+  --color-pact-dark: #1a1a2e;
+  --color-pact-light: #f8f9fa;
+}
+
 :root {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1f1f1f;
-  background-color: #f5f5f5;
+  color-scheme: light dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,10 +20,25 @@
 
 body {
   margin: 0;
-  min-width: 320px;
   min-height: 100vh;
 }
 
-a {
-  color: inherit;
+/* Shared component classes — Tailwind @apply keeps everything utility-based */
+.card {
+  @apply bg-white rounded-lg shadow-md p-6 border border-gray-200 dark:bg-gray-800 dark:border-gray-700;
+}
+
+.code-block {
+  @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto font-mono text-sm;
+}
+
+/* JSON syntax highlighting (rendered via dangerouslySetInnerHTML) */
+.json-key    { color: #89b4fa; }
+.json-string { color: #a6e3a1; }
+.json-number { color: #fab387; }
+.json-bool   { color: #cba6f7; }
+.json-null   { color: #f38ba8; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

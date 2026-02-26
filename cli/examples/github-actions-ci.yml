@@ -1,0 +1,156 @@
+# .github/workflows/contract-tests.yml
+# Contract Testing CI Pipeline
+#
+# Runs on every PR and push to main.
+# Tests GraphQL, REST, and gRPC contracts against Microcks.
+
+name: Contract Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  MICROCKS_URL: http://localhost:8585
+  PACT_BROKER_URL: http://localhost:9292
+  NODE_VERSION: "20"
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      # Microcks mock server
+      microcks:
+        image: quay.io/microcks/microcks-uber:latest
+        ports:
+          - 8585:8080
+        env:
+          SERVICES_UPDATE_INTERVAL: 0
+
+      # Pact Broker (optional — remove if not using Pact)
+      pact-broker:
+        image: pactfoundation/pact-broker
+        ports:
+          - 9292:9292
+        env:
+          PACT_BROKER_DATABASE_URL: sqlite:///pact_broker.sqlite
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── Step 1: Validate schemas ──
+      - name: Validate GraphQL schema
+        run: node cli/ct.cjs schema validate -f schema.graphql --json
+
+      # ── Step 2: Publish contracts to Microcks ──
+      - name: Import GraphQL schema into Microcks
+        run: |
+          # Wait for Microcks to be ready
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:8585/api/services > /dev/null 2>&1; then
+              echo "Microcks is ready"
+              break
+            fi
+            echo "Waiting for Microcks... ($i)"
+            sleep 2
+          done
+
+          # Import all service schemas
+          for schema in *-api; do
+            if [ -f "$schema" ]; then
+              echo "Importing $schema..."
+              node cli/ct.cjs mock import -f "$schema" || true
+            fi
+          done
+
+      - name: Import examples (Postman collections)
+        run: |
+          for collection in microcks-server/artifacts/*-examples.postman.json; do
+            if [ -f "$collection" ]; then
+              echo "Importing $collection..."
+              node cli/ct.cjs mock import -f "$collection" --secondary || true
+            fi
+          done
+
+      # ── Step 3: Verify mock server health ──
+      - name: Check Microcks status
+        run: node cli/ct.cjs mock status --json
+
+      - name: List available services
+        run: node cli/ct.cjs mock list --json
+
+      # ── Step 4: Verify ALL services (auto-discovered) ──
+      - name: Verify all services
+        run: |
+          node cli/ct.cjs test verify-all \
+            --junit test-results/verify-all.xml \
+            --json
+
+      # ── Step 5: Run detailed test suite (all 14 services) ──
+      - name: Run full test suite
+        run: |
+          node cli/ct.cjs test run \
+            -f cli/examples/test-suite.json \
+            --junit test-results/contract-tests.xml \
+            --json
+
+      # ── Step 6: Schema diff (on PRs) ──
+      - name: Schema breaking change detection
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git show origin/${{ github.base_ref }}:schema.graphql > /tmp/old-schema.graphql || true
+          if [ -f /tmp/old-schema.graphql ]; then
+            node cli/ct.cjs contract diff \
+              --old /tmp/old-schema.graphql \
+              --new schema.graphql \
+              --json
+          fi
+
+      # ── Step 6: Pact (optional) ──
+      - name: Publish Pact contracts
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if [ -d "pacts" ]; then
+            node cli/ct.cjs pact publish \
+              -f pacts/ \
+              --consumer "WebApp" \
+              --consumer-version ${{ github.sha }} \
+              --tag main
+          fi
+
+      - name: Pact can-i-deploy check
+        if: github.ref == 'refs/heads/main'
+        run: |
+          node cli/ct.cjs pact can-i-deploy \
+            -a "WebApp" \
+            --version ${{ github.sha }} \
+            --to production || true
+
+      # ── Step 7: Upload test results ──
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contract-test-results
+          path: test-results/
+
+      - name: Publish JUnit results
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: "test-results/*.xml"
+          fail_on_failure: true

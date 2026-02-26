@@ -1,0 +1,235 @@
+{
+  "name": "All Services Contract Tests",
+  "tests": [
+    {
+      "name": "AdsAPI — flushAdRegistryCache",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/AdsAPI/1.0",
+      "query": "mutation flushAdRegistryCache($operationName: String!) { flushAdRegistryCache(operationName: $operationName) { __typename } }",
+      "variables": { "operationName": "mock-op" },
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "AdsAPI — flushAdSiteCache",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/AdsAPI/1.0",
+      "query": "mutation flushAdSiteCache { flushAdSiteCache { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "CmsAPI — getArticleBySlug",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/CmsAPI/1.0",
+      "query": "query getArticleBySlug($slug: String!) { getArticleBySlug(slug: $slug) { __typename } }",
+      "variables": { "slug": "mock-article" },
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "CmsAPI — getAllArticles",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/CmsAPI/1.0",
+      "query": "query getAllArticles { getAllArticles { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "CmsAPI — getVideoById",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/CmsAPI/1.0",
+      "query": "query getVideoById($id: String!) { getVideoById(id: $id) { __typename } }",
+      "variables": { "id": "mock-id" },
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "CmsAPI — getChannelBySlug",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/CmsAPI/1.0",
+      "query": "query getChannelBySlug($slug: String!) { getChannelBySlug(slug: $slug) { __typename } }",
+      "variables": { "slug": "mock-channel" },
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "ContentModulesAPI — contentModules",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/ContentModulesAPI/1.0",
+      "query": "query contentModules { contentModules { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "ContentModulesAPI — fetchContentModuleById",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/ContentModulesAPI/1.0",
+      "query": "query fetchContentModuleById($id: String!) { fetchContentModuleById(id: $id) { __typename } }",
+      "variables": { "id": "mock-id" },
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "DataServiceAPI — trendingArticles",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/DataServiceAPI/1.0",
+      "query": "query trendingArticles { trendingArticles { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "DataServiceAPI — trendingVideos",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/DataServiceAPI/1.0",
+      "query": "query trendingVideos { trendingVideos { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "EpisodeAPI — getScheduleByFeeds",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/EpisodeAPI/1.0",
+      "query": "query getScheduleByFeeds { getScheduleByFeeds { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "HydrationStationAPI — getTweetsByIds",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/HydrationStationAPI/1.0",
+      "query": "query getTweetsByIds { getTweetsByIds { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "HydrationStationAPI — createTweetById",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/HydrationStationAPI/1.0",
+      "query": "mutation createTweetById { createTweetById { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "LivelikeAPI — liveLikeMe",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/LivelikeAPI/1.0",
+      "query": "query liveLikeMe { liveLikeMe { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "LivelikeAPI — liveLikePrograms",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/LivelikeAPI/1.0",
+      "query": "query liveLikePrograms { liveLikePrograms { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "LivelikeAPI — liveLikeChatRooms",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/LivelikeAPI/1.0",
+      "query": "query liveLikeChatRooms { liveLikeChatRooms { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "PushNotificationAPI — getAllNotifications",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/PushNotificationAPI/1.0",
+      "query": "query getAllNotifications { getAllNotifications { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "PushNotificationAPI — getUserPushNotifications",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/PushNotificationAPI/1.0",
+      "query": "query getUserPushNotifications { getUserPushNotifications { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "ReferenceStreamAPI — getReferenceStreamByName",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/ReferenceStreamAPI/1.0",
+      "query": "query getReferenceStreamByName { getReferenceStreamByName { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "SocialProcessorAPI — getMediaId",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/SocialProcessorAPI/1.0",
+      "query": "query getMediaId { getMediaId { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "SocialProcessorAPI — createPostByTenant",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/SocialProcessorAPI/1.0",
+      "query": "mutation createPostByTenant { createPostByTenant { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "SportsSearchAPI — search",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/SportsSearchAPI/1.0",
+      "query": "query search { search { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "SportsSearchAPI — popularSearches",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/SportsSearchAPI/1.0",
+      "query": "query popularSearches { popularSearches { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "StatsAPI — getGamecastBySlug",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/StatsAPI/1.0",
+      "query": "query getGamecastBySlug($slug: String!) { getGamecastBySlug(slug: $slug) { slug status gameDate } }",
+      "variables": { "slug": "game-001" },
+      "expect": { "status": 200, "noErrors": true, "fields": ["getGamecastBySlug.slug", "getGamecastBySlug.status"] }
+    },
+    {
+      "name": "StatsAPI — getScores",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/StatsAPI/1.0",
+      "query": "query getScores { getScores { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "StatsAPI — getSchedule",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/StatsAPI/1.0",
+      "query": "query getSchedule { getSchedule { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "StatsAPI — getStandings",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/StatsAPI/1.0",
+      "query": "query getStandings { getStandings { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "StatsAPI — getUser",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/StatsAPI/1.0",
+      "query": "query getUser { getUser { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "TagAPI — getTagById",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/TagAPI/1.0",
+      "query": "query getTagById { getTagById { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "TagAPI — findTagByMatchTerm",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/TagAPI/1.0",
+      "query": "query findTagByMatchTerm { findTagByMatchTerm { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "UserAPI — getTagById",
+      "protocol": "graphql",
+      "url": "http://localhost:8585/graphql/UserAPI/1.0",
+      "query": "query getTagById { getTagById { __typename } }",
+      "expect": { "status": 200, "noErrors": true }
+    },
+    {
+      "name": "Custom MockServer — healthcheck",
+      "protocol": "rest",
+      "url": "http://localhost:4010/health",
+      "method": "GET",
+      "expect": { "status": 200, "fields": ["status"] }
+    }
+  ]
+}

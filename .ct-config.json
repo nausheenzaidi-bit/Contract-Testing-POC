@@ -1,0 +1,9 @@
+{
+  "microcksUrl": "http://localhost:8585",
+  "pactBrokerUrl": "http://localhost:9292",
+  "schemas": {
+    "graphql": ["schema.graphql", "*-api"],
+    "openapi": [],
+    "proto": []
+  }
+}

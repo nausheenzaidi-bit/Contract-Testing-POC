@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="All Services Contract Tests" tests="32" failures="0" skipped="0" time="0.243">
+  <testsuite name="All Services Contract Tests" tests="32" failures="0" skipped="0" time="0.243" timestamp="2026-02-26T11:24:53.347Z">
+    <testcase name="AdsAPI — flushAdRegistryCache" classname="graphql" time="0.034">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="AdsAPI — flushAdSiteCache" classname="graphql" time="0.020">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="CmsAPI — getArticleBySlug" classname="graphql" time="0.016">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="CmsAPI — getAllArticles" classname="graphql" time="0.007">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="CmsAPI — getVideoById" classname="graphql" time="0.008">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="CmsAPI — getChannelBySlug" classname="graphql" time="0.008">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="ContentModulesAPI — contentModules" classname="graphql" time="0.009">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="ContentModulesAPI — fetchContentModuleById" classname="graphql" time="0.009">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="DataServiceAPI — trendingArticles" classname="graphql" time="0.008">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="DataServiceAPI — trendingVideos" classname="graphql" time="0.007">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="EpisodeAPI — getScheduleByFeeds" classname="graphql" time="0.009">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="HydrationStationAPI — getTweetsByIds" classname="graphql" time="0.007">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="HydrationStationAPI — createTweetById" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="LivelikeAPI — liveLikeMe" classname="graphql" time="0.006">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="LivelikeAPI — liveLikePrograms" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="LivelikeAPI — liveLikeChatRooms" classname="graphql" time="0.004">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="PushNotificationAPI — getAllNotifications" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="PushNotificationAPI — getUserPushNotifications" classname="graphql" time="0.003">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="ReferenceStreamAPI — getReferenceStreamByName" classname="graphql" time="0.006">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="SocialProcessorAPI — getMediaId" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="SocialProcessorAPI — createPostByTenant" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="SportsSearchAPI — search" classname="graphql" time="0.004">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="SportsSearchAPI — popularSearches" classname="graphql" time="0.006">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="StatsAPI — getGamecastBySlug" classname="graphql" time="0.006">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ Field "getGamecastBySlug.slug" present
+✓ Field "getGamecastBySlug.status" present
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="StatsAPI — getScores" classname="graphql" time="0.004">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="StatsAPI — getSchedule" classname="graphql" time="0.007">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="StatsAPI — getStandings" classname="graphql" time="0.008">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="StatsAPI — getUser" classname="graphql" time="0.007">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="TagAPI — getTagById" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="TagAPI — findTagByMatchTerm" classname="graphql" time="0.004">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="UserAPI — getTagById" classname="graphql" time="0.005">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ No GraphQL errors
+]]></system-out>
+    </testcase>
+    <testcase name="Custom MockServer — healthcheck" classname="rest" time="0.001">
+      <system-out><![CDATA[
+✓ Status 200 OK
+✓ Field "status" present
+]]></system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

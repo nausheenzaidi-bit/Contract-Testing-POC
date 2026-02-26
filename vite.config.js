@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -10,8 +9,8 @@ export default defineConfig({
       "/health": "http://localhost:4010",
       "/meta": "http://localhost:4010",
       "/schema-docs": "http://localhost:4010",
-      "/api/ai": "http://localhost:4010",
       "/api/microcks": "http://localhost:4010",
+      "/api/expectations": "http://localhost:4010",
       "/microcks-gql": {
         target: "http://localhost:8585",
         changeOrigin: true,

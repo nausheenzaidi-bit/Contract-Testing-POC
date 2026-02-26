@@ -490,9 +490,7 @@ function buildIndexHtml(operations) {
 </html>`;
 }
 
-const aiEngine = require("./mock-ai-engine.cjs");
 const microcksClient = require("./microcks-client.cjs");
-const scenarioPusher = require("./microcks-scenario-pusher.cjs");
 const mockExpectations = require("./mock-expectations.cjs");
 
 function readBody(req) {
@@ -513,66 +511,6 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === "GET" && parsedUrl.pathname === "/schema-docs") {
     return sendJson(res, 200, buildSchemaDocs());
-  }
-
-  // ── AI Agent endpoints ──
-  if (req.method === "GET" && parsedUrl.pathname === "/api/ai/status") {
-    return sendJson(res, 200, aiEngine.getLlmStatus());
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/ai/config") {
-    try {
-      const body = await readBody(req);
-      const updated = aiEngine.setLlmConfig(body);
-      return sendJson(res, 200, updated);
-    } catch (err) {
-      return sendJson(res, 500, { error: err.message });
-    }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/ai/generate") {
-    try {
-      const { operationName, scenarioType, customField } = await readBody(req);
-      if (!operationName || !scenarioType) return sendJson(res, 400, { error: "operationName and scenarioType required" });
-      const result = await aiEngine.generate(operationName, scenarioType, customField);
-      return sendJson(res, result.error ? 400 : 200, result);
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/ai/suggest") {
-    try {
-      const { operationName } = await readBody(req);
-      if (!operationName) return sendJson(res, 400, { error: "operationName required" });
-      const result = aiEngine.suggest(operationName);
-      return sendJson(res, result.error ? 400 : 200, result);
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/ai/chat") {
-    try {
-      const { message, operationName } = await readBody(req);
-      if (!message) return sendJson(res, 400, { error: "message required" });
-      const result = await aiEngine.chat(message, operationName);
-      return sendJson(res, 200, result);
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/ai/save") {
-    try {
-      const { operationName, scenarioName, data } = await readBody(req);
-      if (!operationName || !scenarioName || !data) return sendJson(res, 400, { error: "operationName, scenarioName, and data required" });
-      const scenarios = readScenarios();
-      if (!scenarios.operations) scenarios.operations = {};
-      const existingKey = Object.keys(scenarios.operations).find(
-        (k) => k.toLowerCase() === operationName.toLowerCase()
-      );
-      const key = existingKey || operationName;
-      if (!scenarios.operations[key]) scenarios.operations[key] = {};
-      scenarios.operations[key][scenarioName] = data;
-      fs.writeFileSync(SCENARIOS_PATH, JSON.stringify(scenarios, null, 2));
-      cachedSchemaDocs = null;
-      return sendJson(res, 200, { saved: true, operationName, scenarioName });
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
   }
 
   // ── Microcks API proxy endpoints ──
@@ -640,70 +578,6 @@ const server = http.createServer(async (req, res) => {
         mockExpectations.clearAll(serviceName);
       }
       return sendJson(res, 200, { success: true });
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
-  }
-
-  // ── Microcks AI generate → set expectation ──
-  if (req.method === "POST" && parsedUrl.pathname === "/api/microcks/ai/generate") {
-    try {
-      const { serviceName, version, operationName, scenarioType, customField } = await readBody(req);
-      if (!serviceName || !operationName || !scenarioType) {
-        return sendJson(res, 400, { error: "serviceName, operationName, and scenarioType required" });
-      }
-      const aiResult = await aiEngine.generate(operationName, scenarioType, customField);
-      if (aiResult.error) return sendJson(res, 400, aiResult);
-
-      const responseData = aiResult.scenario || {};
-      const responseContent = responseData.data ? responseData : { data: responseData };
-
-      // Set as a variable-aware expectation: different inputs → different responses
-      const expResult = mockExpectations.setExpectation({
-        serviceName,
-        operationName,
-        response: responseContent,
-        matchVariables: aiResult.testVariables || null,
-        scenarioName: scenarioType,
-        description: aiResult.description,
-      });
-
-      return sendJson(res, 200, {
-        ...aiResult,
-        expectation: expResult,
-      });
-    } catch (e) { return sendJson(res, 500, { error: e.message }); }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/microcks/ai/suggest") {
-    try {
-      const { operationName } = await readBody(req);
-      if (!operationName) return sendJson(res, 400, { error: "operationName required" });
-      const result = aiEngine.suggest(operationName);
-      return sendJson(res, result.error ? 400 : 200, result);
-    } catch (e) { return sendJson(res, 400, { error: e.message }); }
-  }
-
-  if (req.method === "POST" && parsedUrl.pathname === "/api/microcks/ai/chat") {
-    try {
-      const { message, operationName, serviceName, version } = await readBody(req);
-      if (!message) return sendJson(res, 400, { error: "message required" });
-      const result = await aiEngine.chat(message, operationName);
-
-      if (serviceName && result.scenarios?.length > 0) {
-        result.expectations = result.scenarios.map((s) => {
-          const responseData = s.scenario || s.response || {};
-          const responseContent = responseData.data ? responseData : { data: responseData };
-          return mockExpectations.setExpectation({
-            serviceName,
-            operationName: operationName || "unknown",
-            response: responseContent,
-            matchVariables: s.testVariables || null,
-            scenarioName: s.scenarioType,
-            description: s.description || "",
-          });
-        });
-      }
-
-      return sendJson(res, 200, result);
     } catch (e) { return sendJson(res, 400, { error: e.message }); }
   }
 
